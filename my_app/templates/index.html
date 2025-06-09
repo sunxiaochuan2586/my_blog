@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% for post in posts %}
+<div class="post-list-item">
+    <article>
+        <h2><a href="{{ url_for('routes.post_detail', post_id=post.id) }}">{{ post.title }}</a></h2>
+        <p class="post-meta">
+            由 {{ post.author.username }} 发布于北京时间 {{ post.date_posted | to_local_time }}
+        </p>
+    </article>
+    {# 在最后一篇文章后不显示分割线 #}
+    {% if not loop.last %}
+    <hr>
+    {% endif %}
+</div>
+{% else %}
+<div class="post-list-item">
+    <p>空空如也，快登录后撰写你的第一篇博文吧！</p>
+</div>
+{% endfor %}
+{% endblock %}

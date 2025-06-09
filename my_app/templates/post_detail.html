@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="post-detail-content">
+    <article class="post-content">
+        <h1>{{ post.title }}</h1>
+        <p class="post-meta">
+            由 {{ post.author.username if post.author else '匿名' }} 发布于 {{ post.date_posted | to_local_time }}
+        </p>
+        <div>
+            {{ post.content | md | safe }}
+        </div>
+    </article>
+
+    {% if current_user.is_authenticated and post.author == current_user %}
+    <div class="actions">
+        <a href="{{ url_for('routes.update_post', post_id=post.id) }}" class="button">编辑</a>
+        <form action="{{ url_for('routes.delete_post', post_id=post.id) }}" method="POST" style="display:inline;">
+            <input type="submit" value="删除" class="button secondary"
+                onclick="return confirm('警告：此操作不可逆！\n你确定要永久删除这篇文章吗？');">
+        </form>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
