@@ -4,9 +4,11 @@ from my_app import db, bcrypt
 from my_app.models import User, Post
 from my_app.forms import RegistrationForm, LoginForm, PostForm
 from flask_login import login_user, logout_user, current_user, login_required
+from my_app.forms import  ChangePasswordForm
 
 # 确保这里的变量名是 routes_bp
-routes_bp = Blueprint('routes', __name__)
+routes_bp = Blueprint('routes', __name__ )
+
 
 @routes_bp.route('/')
 def index():
@@ -105,3 +107,29 @@ def inject_recent_posts():
     """
     recent_posts = Post.query.order_by(Post.date_posted.desc()).limit(5).all()
     return dict(recent_posts=recent_posts)
+
+@routes_bp.route('/profile')
+@login_required
+def profile():
+    """显示用户个人资料页面"""
+    # Flask-Login 提供的 current_user 就是当前登录的用户对象
+    # 我们可以直接把它传递给模板
+    return render_template('profile.html', title='我的账户')
+
+@routes_bp.route('/change-password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    form = ChangePasswordForm()
+    if form.validate_on_submit():
+        # 1. 验证用户输入的“当前密码”是否正确
+        if bcrypt.check_password_hash(current_user.password_hash, form.current_password.data):
+            # 2. 如果正确，就设置新密码
+            new_hashed_password = bcrypt.generate_password_hash(form.new_password.data).decode('utf-8')
+            current_user.password_hash = new_hashed_password
+            db.session.commit()
+            flash('密码修改成功！', 'success')
+            return redirect(url_for('routes.profile')) # 修改成功后，跳回到个人资料页
+        else:
+            # 3. 如果“当前密码”不正确，就给出提示
+            flash('当前密码不正确，请重试。', 'danger')
+    return render_template('change_password.html', title='修改密码', form=form)

@@ -36,3 +36,12 @@ class PostForm(FlaskForm):
     title = StringField('标题', validators=[DataRequired()])
     content = TextAreaField('内容', validators=[DataRequired()])
     submit = SubmitField('发布')
+    
+class ChangePasswordForm(FlaskForm):
+    current_password = PasswordField('当前密码', validators=[DataRequired()])
+    new_password = PasswordField('新密码', validators=[DataRequired()])
+    new_password2 = PasswordField(
+        '确认新密码', 
+        validators=[DataRequired(), EqualTo('new_password', message='两次输入的新密码必须一致！')]
+    )
+    submit = SubmitField('确认修改')

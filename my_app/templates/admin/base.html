@@ -1,0 +1,28 @@
+{# 继承你现有的、风格统一的基础模板 #}
+{% extends "base.html" %}
+
+{# 我们不再需要侧边栏了，所以重写整个 page_wrapper #}
+{% block page_wrapper %}
+<div class="admin-main-container">
+
+    {# 保留和前台风格一致的消息闪现区域 #}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-messages-container">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+            <i class="fas fa-info-circle"></i>
+            <span>{{ message }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    {# 这是后台页面的主要内容区，将由具体页面填充 #}
+    <div class="admin-content-area">
+        {% block admin_content %}{% endblock %}
+    </div>
+
+</div>
+{% endblock page_wrapper %}

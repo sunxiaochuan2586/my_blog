@@ -1,0 +1,511 @@
+{% extends "base.html" %}
+
+{% block page_wrapper %}
+<div class="admin-dashboard">
+    <!-- 管理后台导航 -->
+    <nav class="admin-sidebar">
+        <div class="sidebar-header">
+            <div class="admin-logo">
+                <i class="fas fa-crown"></i>
+                <span>管理中心</span>
+            </div>
+        </div>
+
+        <div class="sidebar-menu">
+            <div class="menu-section">
+                <ul class="menu-list">
+                    <li class="menu-item active">
+                        <a href="{{ url_for('admin.dashboard') }}" class="menu-link">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>仪表板</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="{{ url_for('admin.post_list') }}" class="menu-link">
+                            <i class="fas fa-file-alt"></i>
+                            <span>文章管理</span>
+                            <span class="menu-badge">{{ post_count }}</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="{{ url_for('admin.user_list') }}" class="menu-link">
+                            <i class="fas fa-users"></i>
+                            <span>用户管理</span>
+                            <span class="menu-badge">{{ user_count }}</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <a href="{{ url_for('routes.index') }}" class="back-to-site">
+                <i class="fas fa-arrow-left"></i>
+                <span>返回网站</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- 主要内容区域 -->
+    <main class="admin-main">
+        <!-- 顶部栏 -->
+        <header class="admin-header">
+            <div class="header-left">
+                <h1 class="page-title">仪表板</h1>
+            </div>
+            <div class="header-right">
+                <div class="admin-user-menu">
+                    <div class="user-avatar">
+                        <i class="fas fa-user-crown"></i>
+                    </div>
+                    <div class="user-info">
+                        <span class="user-name">{{ current_user.username }}</span>
+                        <span class="user-role">管理员</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 仪表板内容 -->
+        <div class="dashboard-content">
+            <!-- 统计卡片 -->
+            <section class="stats-section">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon users">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-number">{{ user_count }}</div>
+                            <div class="stat-label">注册用户</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon posts">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-number">{{ post_count }}</div>
+                            <div class="stat-label">发布文章</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon views">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-number">{{ post_count }}</div>
+                            <div class="stat-label">总访问量</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 快速操作 -->
+            <section class="quick-actions-section">
+                <h3 class="section-title">快速操作</h3>
+                <div class="quick-actions-grid">
+                    <a href="{{ url_for('routes.new_post') }}" class="quick-action">
+                        <div class="action-icon">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <span>新建文章</span>
+                    </a>
+
+                    <a href="{{ url_for('admin.user_list') }}" class="quick-action">
+                        <div class="action-icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <span>管理用户</span>
+                    </a>
+
+                    <a href="#" class="quick-action" onclick="alert('功能开发中...')">
+                        <div class="action-icon">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        <span>系统设置</span>
+                    </a>
+
+                    <a href="#" class="quick-action" onclick="alert('功能开发中...')">
+                        <div class="action-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <span>查看报表</span>
+                    </a>
+                </div>
+            </section>
+        </div>
+    </main>
+</div>
+
+<style>
+    /* 管理后台样式 */
+    .admin-dashboard {
+        display: flex;
+        min-height: 100vh;
+        background: var(--bg-primary);
+    }
+
+    /* 侧边栏 */
+    .admin-sidebar {
+        width: 280px;
+        background: var(--bg-card);
+        border-right: 1px solid var(--border-color);
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        z-index: 1000;
+        overflow-y: auto;
+    }
+
+    .sidebar-header {
+        padding: 2rem 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .admin-logo {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .admin-logo i {
+        width: 32px;
+        height: 32px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1rem;
+    }
+
+    .sidebar-menu {
+        flex: 1;
+        padding: 1.5rem 0;
+    }
+
+    .menu-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .menu-item {
+        margin-bottom: 0.25rem;
+    }
+
+    .menu-link {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.875rem 1.5rem;
+        color: var(--text-secondary);
+        text-decoration: none;
+        transition: var(--transition);
+        position: relative;
+    }
+
+    .menu-link:hover,
+    .menu-item.active .menu-link {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+    }
+
+    .menu-item.active .menu-link::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+    }
+
+    .menu-link i {
+        width: 20px;
+        text-align: center;
+        flex-shrink: 0;
+    }
+
+    .menu-badge {
+        margin-left: auto;
+        background: var(--accent-primary);
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        min-width: 20px;
+        text-align: center;
+    }
+
+    .sidebar-footer {
+        padding: 1.5rem;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .back-to-site {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        background: var(--bg-secondary);
+        color: var(--text-secondary);
+        text-decoration: none;
+        border-radius: var(--radius-lg);
+        transition: var(--transition);
+        font-weight: 500;
+    }
+
+    .back-to-site:hover {
+        background: var(--bg-tertiary);
+        color: var(--text-primary);
+    }
+
+    /* 主要内容区域 */
+    .admin-main {
+        flex: 1;
+        margin-left: 280px;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+    /* 顶部栏 */
+    .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem 2rem;
+        background: var(--bg-card);
+        border-bottom: 1px solid var(--border-color);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    .page-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .admin-user-menu {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.75rem 1rem;
+        background: var(--bg-secondary);
+        border-radius: var(--radius-lg);
+    }
+
+    .user-avatar {
+        width: 32px;
+        height: 32px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 0.9rem;
+    }
+
+    .user-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .user-name {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.9rem;
+    }
+
+    .user-role {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+    }
+
+    /* 仪表板内容 */
+    .dashboard-content {
+        flex: 1;
+        padding: 2rem;
+        overflow-y: auto;
+    }
+
+    /* 统计卡片 */
+    .stats-section {
+        margin-bottom: 3rem;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .stat-card {
+        background: var(--bg-card);
+        border-radius: var(--radius-xl);
+        padding: 2rem;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-card);
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-floating);
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+        flex-shrink: 0;
+    }
+
+    .stat-icon.users {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+    }
+
+    .stat-icon.posts {
+        background: linear-gradient(135deg, #f093fb, #f5576c);
+    }
+
+    .stat-icon.views {
+        background: linear-gradient(135deg, #4facfe, #00f2fe);
+    }
+
+    .stat-info {
+        flex: 1;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        line-height: 1;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+
+    /* 快速操作 */
+    .quick-actions-section {
+        margin-bottom: 2rem;
+    }
+
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 1.5rem;
+    }
+
+    .quick-actions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .quick-action {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        padding: 2rem;
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        text-decoration: none;
+        color: var(--text-secondary);
+        transition: var(--transition);
+        text-align: center;
+        border: 1px solid var(--border-color);
+    }
+
+    .quick-action:hover {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .action-icon {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+    }
+
+    .quick-action span {
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+        .admin-sidebar {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .admin-sidebar.open {
+            transform: translateX(0);
+        }
+
+        .admin-main {
+            margin-left: 0;
+        }
+
+        .stats-grid,
+        .quick-actions-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .dashboard-content {
+            padding: 1rem;
+        }
+
+        .admin-header {
+            padding: 1rem;
+        }
+
+        .stat-card {
+            padding: 1.5rem;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+{% endblock page_wrapper %}
