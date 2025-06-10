@@ -1,0 +1,186 @@
+{# templates/_macros.html (简化版) #}
+
+{% macro render_md_editor(field, draft_key) %}
+<div class="form-group">
+    {{ field.label(class="form-label") }}
+    <div class="custom-editor-container">
+        <div class="custom-editor-toolbar">
+            <!-- 工具栏按钮将由 JavaScript 动态生成 -->
+        </div>
+
+        {{ field(class="custom-editor-textarea",
+        placeholder="在这里开始用 Markdown 书写你的故事...",
+        value=(field.data if field.data else '')) }}
+
+        <div class="editor-status">
+            <span class="editor-status-message"></span>
+            <button type="button" class="clear-draft-button" style="display: none;">
+                清除草稿
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        const scriptId = `editor-script-for-{{ field.id }}`;
+        if (document.getElementById(scriptId)) return;
+
+        const toolbar = document.querySelector('.custom-editor-toolbar');
+        const textarea = document.querySelector('.custom-editor-textarea');
+
+        if (!toolbar || !textarea) return;
+
+        // 工具栏按钮配置
+        const buttons = [
+            { tag: 'B', title: '加粗 (Ctrl+B)', prefix: '**', suffix: '**', key: 'b' },
+            { tag: 'I', title: '斜体 (Ctrl+I)', prefix: '*', suffix: '*', key: 'i' },
+            { type: 'separator' },
+            { tag: 'H1', title: '一级标题', prefix: '# ', linePrefix: true },
+            { tag: 'H2', title: '二级标题', prefix: '## ', linePrefix: true },
+            { tag: 'H3', title: '三级标题', prefix: '### ', linePrefix: true },
+            { type: 'separator' },
+            { tag: '"', title: '引用', prefix: '> ', linePrefix: true },
+            { tag: 'UL', title: '无序列表', prefix: '- ', linePrefix: true },
+            { tag: 'OL', title: '有序列表', prefix: '1. ', linePrefix: true },
+            { type: 'separator' },
+            { tag: '🔗', title: '链接', prefix: '[', suffix: '](https://)', key: 'k' },
+            { tag: '🖼️', title: '图片', prefix: '![', suffix: '](https://)' },
+            { tag: '&lt;/&gt;', title: '行内代码', prefix: '`', suffix: '`' },
+            { tag: '💻', title: '代码块', prefix: '\n```\n', suffix: '\n```\n' },
+        ];
+
+        // 创建工具栏按钮
+        buttons.forEach(b => {
+            if (b.type === 'separator') {
+                const separator = document.createElement('div');
+                separator.className = 'toolbar-separator';
+                toolbar.appendChild(separator);
+                return;
+            }
+
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.title = b.title;
+            button.innerHTML = b.tag;
+            button.addEventListener('click', () => applyMarkdown(b));
+            toolbar.appendChild(button);
+        });
+
+        function applyMarkdown(format) {
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const selectedText = textarea.value.substring(start, end);
+
+            if (format.linePrefix) {
+                const startLine = textarea.value.lastIndexOf('\n', start - 1) + 1;
+                const originalLine = textarea.value.substring(startLine, end);
+                const newText = originalLine.split('\n').map((line, index) => {
+                    if (format.prefix === '1. ') {
+                        return `${index + 1}. ${line}`;
+                    }
+                    return `${format.prefix}${line}`;
+                }).join('\n');
+
+                textarea.value = textarea.value.substring(0, startLine) + newText + textarea.value.substring(end);
+                textarea.focus();
+                textarea.selectionStart = startLine;
+                textarea.selectionEnd = startLine + newText.length;
+            } else {
+                const replacement = (format.prefix || '') + selectedText + (format.suffix || '');
+                textarea.value = textarea.value.substring(0, start) + replacement + textarea.value.substring(end);
+                textarea.focus();
+
+                if (selectedText) {
+                    textarea.selectionStart = start + replacement.length;
+                    textarea.selectionEnd = start + replacement.length;
+                } else {
+                    textarea.selectionStart = start + (format.prefix || '').length;
+                    textarea.selectionEnd = start + (format.prefix || '').length;
+                }
+            }
+
+            textarea.dispatchEvent(new Event('input'));
+        }
+
+        // 快捷键支持
+        textarea.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                const key = e.key.toLowerCase();
+                const format = buttons.find(b => b.key === key);
+                if (format) {
+                    e.preventDefault();
+                    applyMarkdown(format);
+                }
+            }
+        });
+
+        // 草稿功能
+        const storageKey = `editor-draft-{{ draft_key }}`;
+        const statusMessage = document.querySelector('.editor-status-message');
+        const clearDraftBtn = document.querySelector('.clear-draft-button');
+        let saveInterval;
+
+        function showStatus(text, duration = 2000) {
+            statusMessage.textContent = text;
+            statusMessage.classList.add('visible');
+            setTimeout(() => {
+                statusMessage.classList.remove('visible');
+            }, duration);
+        }
+
+        function saveDraft() {
+            if (textarea.value.trim().length > 10) {
+                localStorage.setItem(storageKey, textarea.value);
+                const time = new Date().toLocaleTimeString('zh-CN', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                showStatus(`草稿已于 ${time} 保存`);
+            }
+        }
+
+        function loadDraft() {
+            const savedDraft = localStorage.getItem(storageKey);
+            if (savedDraft && !textarea.value.trim()) {
+                textarea.value = savedDraft;
+                showStatus('已恢复本地草稿');
+                clearDraftBtn.style.display = 'inline-flex';
+            }
+        }
+
+        function clearDraft() {
+            localStorage.removeItem(storageKey);
+            clearDraftBtn.style.display = 'none';
+            showStatus('本地草稿已清除');
+        }
+
+        // 初始化草稿功能
+        loadDraft();
+
+        textarea.addEventListener('input', () => {
+            clearInterval(saveInterval);
+            saveInterval = setInterval(saveDraft, 3000);
+            clearDraftBtn.style.display = textarea.value.trim().length > 0 ? 'inline-flex' : 'none';
+        });
+
+        clearDraftBtn.addEventListener('click', () => {
+            if (confirm('确定要清除本地保存的草稿吗？')) {
+                textarea.value = '';
+                clearDraft();
+            }
+        });
+
+        // 表单提交时清除草稿
+        textarea.closest('form')?.addEventListener('submit', () => {
+            clearInterval(saveInterval);
+            setTimeout(clearDraft, 100);
+        });
+
+        // 标记脚本已加载
+        const scriptElement = document.createElement('script');
+        scriptElement.id = scriptId;
+        document.body.appendChild(scriptElement);
+    })();
+</script>
+{% endmacro %}

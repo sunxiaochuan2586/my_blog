@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% from "_macros.html" import render_md_editor with context %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{{ title }}</h1>
+</div>
+<form method="POST" action="">
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+        {{ form.title.label(class="form-label") }}
+        {{ form.title(placeholder="给你的文章起个名字") }}
+    </div>
+
+    {% if post %}{% set draft_key = 'post-' ~ post.id %}{% else %}{% set draft_key = 'post-new' %}{% endif %}
+    {{ render_md_editor(form.content, draft_key) }}
+
+    <div class="form-group" style="margin-top: 2rem;">
+        {{ form.submit(class="button") }}
+    </div>
+</form>
+{% endblock content %}

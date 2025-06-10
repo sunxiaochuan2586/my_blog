@@ -1,0 +1,284 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="post-detail-content">
+    <article class="post-content">
+        <h1>{{ post.title }}</h1>
+        <p class="post-meta">
+            由 {{ post.author.username if post.author else '匿名' }} 发布于 {{ post.date_posted | to_local_time }}
+        </p>
+        <div class="post-body">
+            {{ post.content | md | safe }}
+        </div>
+    </article>
+
+    {% if current_user.is_authenticated and post.author == current_user %}
+    <div class="actions">
+        <a href="{{ url_for('routes.update_post', post_id=post.id) }}" class="button">编辑</a>
+        <form action="{{ url_for('routes.delete_post', post_id=post.id) }}" method="POST" style="display:inline;">
+            <input type="submit" value="删除" class="button secondary"
+                onclick="return confirm('警告：此操作不可逆！\n你确定要永久删除这篇文章吗？');">
+        </form>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    /* 字体优化 */
+    .post-detail-content {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
+        line-height: 1.7;
+    }
+
+    /* 文章标题 */
+    .post-content h1 {
+        font-size: 2.2rem;
+        font-weight: 700;
+        line-height: 1.3;
+        margin: 0 0 1rem 0;
+        color: #1a1a1a;
+        letter-spacing: -0.02em;
+    }
+
+    /* 文章元信息 */
+    .post-meta {
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #eee;
+        font-weight: 400;
+    }
+
+    /* 文章内容区域 */
+    .post-body {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #333;
+    }
+
+    /* 优化段落间距 */
+    .post-body p {
+        margin: 1.2rem 0;
+        text-align: justify;
+    }
+
+    /* 标题层级优化 */
+    .post-body h1,
+    .post-body h2,
+    .post-body h3,
+    .post-body h4,
+    .post-body h5,
+    .post-body h6 {
+        font-weight: 600;
+        line-height: 1.4;
+        margin: 2rem 0 1rem 0;
+        color: #2c3e50;
+        letter-spacing: -0.01em;
+    }
+
+    .post-body h1 {
+        font-size: 1.8rem;
+    }
+
+    .post-body h2 {
+        font-size: 1.5rem;
+    }
+
+    .post-body h3 {
+        font-size: 1.3rem;
+    }
+
+    .post-body h4 {
+        font-size: 1.15rem;
+    }
+
+    .post-body h5 {
+        font-size: 1.05rem;
+    }
+
+    .post-body h6 {
+        font-size: 1rem;
+    }
+
+    /* 列表样式优化 */
+    .post-body ul,
+    .post-body ol {
+        margin: 1.2rem 0;
+        padding-left: 2rem;
+    }
+
+    .post-body li {
+        margin: 0.5rem 0;
+        line-height: 1.7;
+    }
+
+    /* 引用块优化 */
+    .post-body blockquote {
+        margin: 1.5rem 0;
+        padding: 1rem 1.5rem;
+        border-left: 4px solid #ddd;
+        background-color: #f9f9f9;
+        font-style: italic;
+        color: #555;
+    }
+
+    /* 代码样式优化 */
+    .post-body code {
+        font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Consolas', monospace;
+        font-size: 0.9em;
+        background-color: #f5f5f5;
+        padding: 0.2rem 0.4rem;
+        border-radius: 3px;
+        color: #d14;
+    }
+
+    .post-body pre {
+        font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Consolas', monospace;
+        background-color: #f8f8f8;
+        padding: 1.2rem;
+        border-radius: 6px;
+        overflow-x: auto;
+        margin: 1.5rem 0;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        border: 1px solid #e1e1e1;
+    }
+
+    .post-body pre code {
+        background: none;
+        padding: 0;
+        color: #333;
+    }
+
+    /* 链接样式优化 */
+    .post-body a {
+        color: #0066cc;
+        text-decoration: none;
+        border-bottom: 1px solid transparent;
+        transition: border-bottom-color 0.2s ease;
+    }
+
+    .post-body a:hover {
+        border-bottom-color: #0066cc;
+    }
+
+    /* 图片样式优化 */
+    .post-body img {
+        max-width: 100%;
+        height: auto;
+        margin: 1.5rem 0;
+        border-radius: 4px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* 表格样式优化 */
+    .post-body table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1.5rem 0;
+        font-size: 0.95rem;
+    }
+
+    .post-body th,
+    .post-body td {
+        padding: 0.8rem;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .post-body th {
+        font-weight: 600;
+        background-color: #f8f9fa;
+    }
+
+    /* 分割线优化 */
+    .post-body hr {
+        border: none;
+        height: 1px;
+        background-color: #e1e1e1;
+        margin: 2rem 0;
+    }
+
+    /* 操作按钮区域 */
+    .actions {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #eee;
+        text-align: right;
+    }
+
+    /* 按钮样式优化 */
+    .button {
+        display: inline-block;
+        padding: 0.6rem 1.2rem;
+        margin-left: 0.5rem;
+        color: white;
+        text-decoration: none;
+        border: none;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        font-family: inherit;
+    }
+
+
+
+    .button.secondary {
+        background-color: #dc3545;
+        margin-left: 0.5rem;
+    }
+
+    .button.secondary:hover {
+        background-color: #c82333;
+    }
+
+    /* 响应式优化 */
+    @media (max-width: 768px) {
+        .post-detail-content {
+            padding: 1rem;
+        }
+
+        .post-content h1 {
+            font-size: 1.8rem;
+        }
+
+        .post-body {
+            font-size: 1rem;
+        }
+
+        .actions {
+            text-align: center;
+        }
+
+        .button {
+            display: block;
+            margin: 0.5rem 0;
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .post-content h1 {
+            font-size: 1.6rem;
+        }
+
+        .post-body h1 {
+            font-size: 1.5rem;
+        }
+
+        .post-body h2 {
+            font-size: 1.3rem;
+        }
+
+        .post-body h3 {
+            font-size: 1.15rem;
+        }
+    }
+</style>
+{% endblock %}
