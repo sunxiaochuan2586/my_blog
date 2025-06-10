@@ -44,7 +44,8 @@
                 <div class="stat-label">文章</div>
             </div>
             <div class="stat-item">
-                <span class="stat-number">{{ (posts|length * 156) }}</span>
+                <!-- 在这里显示总阅读量 -->
+                <span class="stat-number">{{ total_views or 0 }}</span>
                 <div class="stat-label">阅读</div>
             </div>
             <div class="stat-item">

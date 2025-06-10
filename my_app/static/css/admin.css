@@ -30,22 +30,22 @@ body {
 }
 
 .admin-sidebar-header {
-    padding: 2rem 1.5rem;
-    background: linear-gradient(135deg, #3498db, #2980b9);
+    padding: 1.25rem 1.5rem; /* 从 2rem 减少到 1.25rem */
+    background: #2c3e50; /* 改为与侧边栏相同的颜色，去掉渐变 */
     text-align: center;
     border-bottom: 1px solid #34495e;
 }
 
 .admin-sidebar-header h2 {
-    margin: 0 0 0.5rem;
-    font-size: 1.25rem;
+    margin: 0 0 0.25rem; /* 减少底部间距 */
+    font-size: 1rem; /* 从 1.25rem 减少到 1rem */
     font-weight: 600;
 }
 
 .admin-sidebar-header p {
     margin: 0;
-    opacity: 0.8;
-    font-size: 0.875rem;
+    opacity: 0.7; /* 稍微降低透明度 */
+    font-size: 0.75rem; /* 从 0.875rem 减少到 0.75rem */
 }
 
 .admin-nav {

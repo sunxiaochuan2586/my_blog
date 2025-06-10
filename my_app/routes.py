@@ -5,6 +5,8 @@ from my_app.models import User, Post
 from my_app.forms import RegistrationForm, LoginForm, PostForm
 from flask_login import login_user, logout_user, current_user, login_required
 from my_app.forms import  ChangePasswordForm
+from sqlalchemy import func # <-- 导入 func
+
 
 # 确保这里的变量名是 routes_bp
 routes_bp = Blueprint('routes', __name__ )
@@ -63,8 +65,15 @@ def logout():
 
 @routes_bp.route('/post/<int:post_id>')
 def post_detail(post_id: int):
-    post = Post.query.get_or_404(post_id)
+    post = Post.query.get_or_404(post_id)    
+    if post.views is None:
+        post.views = 0
+    post.views += 1  # 使用更简洁的 += 语法
+    db.session.commit()
     return render_template('post_detail.html', post=post, title=post.title)
+
+
+
 
 
 @routes_bp.route('/post/<int:post_id>/update', methods=['GET', 'POST'])
@@ -98,7 +107,7 @@ def delete_post(post_id: int):
     db.session.delete(post)
     db.session.commit()
     flash('文章已删除。', 'success')
-    return redirect(url_for('routes.index'))
+    return redirect(url_for('routes.index'))    
 
 @routes_bp.context_processor
 def inject_recent_posts():
@@ -111,10 +120,25 @@ def inject_recent_posts():
 @routes_bp.route('/profile')
 @login_required
 def profile():
+    """
+    个人资料页视图函数。
+    需要计算并传递该用户所有文章的总浏览量。
+    """
+    # 查询当前用户的所有文章
     posts = Post.query.filter_by(author=current_user).order_by(Post.date_posted.desc()).all()
-    # Flask-Login 提供的 current_user 就是当前登录的用户对象
-    # 我们可以直接把它传递给模板
-    return render_template('profile.html', title='我的账户')
+    
+    # 使用数据库函数 sum() 来高效计算总浏览量
+    # .scalar() 会返回查询结果的第一列的第一行，如果没有结果则返回 None
+    total_views = db.session.query(func.sum(Post.views)).filter_by(author=current_user).scalar()
+    
+    # 如果用户还没有任何文章或浏览量，total_views 可能为 None，我们将其设为 0
+    if total_views is None:
+        total_views = 0
+
+    return render_template('profile.html', 
+                           title='我的账户', 
+                           posts=posts, 
+                           total_views=total_views)
 
 @routes_bp.route('/change-password', methods=['GET', 'POST'])
 @login_required

@@ -6,6 +6,7 @@ from flask_login import current_user
 from my_app.models import User, Post
 from my_app import db
 from functools import wraps
+from sqlalchemy import func  # <-- 关键改动 1：在这里添加 func 的导入
 
 # --- 1. 管理员权限装饰器 (你的版本已经很完美了) ---
 def admin_required(f):
@@ -33,12 +34,17 @@ def dashboard():
     user_count = User.query.count()
     post_count = Post.query.count()
     
+    # --- 关键改动 2：使用正确的方法计算总浏览量 ---
+    # 使用数据库函数 func.sum() 来高效计算
+    total_views = db.session.query(func.sum(Post.views)).scalar()
+    # 如果没有任何文章，total_views 会是 None，所以我们将其设为 0
+    if total_views is None:
+        total_views = 0
+    # --- 改动结束 ---
+
     # 查询列表数据，用于在仪表盘上直接展示
     all_users = User.query.order_by(User.registration_date.desc()).limit(5).all() # 只取最新的5个用户
     all_posts = Post.query.order_by(Post.date_posted.desc()).limit(5).all() # 只取最新的5篇文章
-
-    # '总浏览量' 是一个高级功能，我们暂时用一个假数据来填充
-    total_views = post_count  
 
     # 把所有需要的数据一次性传递给 dashboard.html
     return render_template(
@@ -47,7 +53,7 @@ def dashboard():
         user_count=user_count,
         post_count=post_count,
         active_page='dashboard',
-        total_views=total_views,
+        total_views=total_views, # 现在这里是真实的总浏览量
         users=all_users,  # 将用户列表传给模板
         posts=all_posts   # 将文章列表传给模板
         )

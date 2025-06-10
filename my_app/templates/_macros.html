@@ -47,7 +47,7 @@
             { tag: '🔗', title: '链接', prefix: '[', suffix: '](https://)', key: 'k' },
             { tag: '🖼️', title: '图片', prefix: '![', suffix: '](https://)' },
             { tag: '&lt;/&gt;', title: '行内代码', prefix: '`', suffix: '`' },
-            { tag: '💻', title: '代码块', prefix: '\n```\n', suffix: '\n```\n' },
+            { tag: '💻', title: '代码块' }, // <-- 移除了 prefix 和 suffix
         ];
 
         // 创建工具栏按钮
@@ -71,6 +71,24 @@
             const start = textarea.selectionStart;
             const end = textarea.selectionEnd;
             const selectedText = textarea.value.substring(start, end);
+
+            // 特殊处理代码块按钮
+            if (format.tag === '💻') {
+                const lang = prompt("请输入代码语言 (例如: python, javascript, html):", "python");
+                if (lang === null) return; // 用户取消了输入
+                
+                const prefix = `\n\`\`\`${lang.toLowerCase() || ''}\n`;
+                const suffix = '\n```\n';
+                const replacement = prefix + selectedText + suffix;
+
+                textarea.value = textarea.value.substring(0, start) + replacement + textarea.value.substring(end);
+                textarea.focus();
+                textarea.selectionStart = start + prefix.length;
+                textarea.selectionEnd = start + prefix.length + selectedText.length;
+                
+                textarea.dispatchEvent(new Event('input'));
+                return; // 处理完毕，提前返回
+            }
 
             if (format.linePrefix) {
                 const startLine = textarea.value.lastIndexOf('\n', start - 1) + 1;

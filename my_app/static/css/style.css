@@ -429,10 +429,12 @@ input[type="submit"] {
     font-family: var(--font-primary);
 }
 
+/* --- 关键修改：修复按钮悬停效果 --- */
 .button:hover,
 button:hover,
 input[type="submit"]:hover {
-    background: var(--accent-secondary);
+    /* 不再使用 background 变色，而是使用 filter 提亮 */
+    filter: brightness(115%);
     transform: translateY(-1px);
 }
 
@@ -445,6 +447,7 @@ input[type="submit"]:hover {
 .button.secondary:hover {
     background: var(--bg-tertiary);
     border-color: var(--border-accent);
+    filter: none; /* 确保次要按钮不受影响 */
 }
 
 .button:disabled,
@@ -453,6 +456,7 @@ input[type="submit"]:disabled {
     opacity: 0.6;
     cursor: not-allowed;
     transform: none;
+    filter: none;
 }
 
 /* === 登录/注册页面 === */
@@ -508,7 +512,7 @@ input[type="submit"]:disabled {
 }
 
 .password-toggle:hover {
-    background: var(--accent-secondary);
+    filter: brightness(115%);
 }
 
 .remember-me-group {
@@ -793,8 +797,6 @@ fieldset {
     h3 {
         font-size: 1.25rem;
     }
-<<<<<<< HEAD
-=======
 }
 
 /* ===================================================================
@@ -862,6 +864,11 @@ fieldset {
     display: flex;
     align-items: center;
     gap: 0.25rem;
+}
+
+.profile-meta .meta-item i {
+    font-size: 0.8rem;
+    opacity: 0.8;
 }
 
 .profile-badges {
@@ -967,7 +974,7 @@ fieldset {
 }
 
 .action-link.primary:hover {
-    background: var(--accent-secondary);
+    filter: brightness(115%);
     transform: translateY(-1px);
 }
 
@@ -1014,6 +1021,8 @@ fieldset {
 .new-post-link:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
+    filter: brightness(115%);
+    color: white; /* <-- 关键修复：在这里添加此行 */
 }
 
 /* --- 文章条目 - 简化版 --- */
@@ -1094,6 +1103,7 @@ fieldset {
 
 .post-action-btn:hover {
     transform: translateY(-1px);
+    filter: brightness(115%);
 }
 
 .post-excerpt {
@@ -1142,8 +1152,8 @@ fieldset {
 }
 
 .empty-state .btn:hover {
-    background: var(--accent-secondary);
     transform: translateY(-1px);
+    filter: brightness(115%);
 }
 
 /* --- 响应式优化 --- */
@@ -1311,6 +1321,7 @@ fieldset {
     /* 确保hover时不发生任何位移 */
     transform: translateY(-50%) !important;
     background: transparent !important;
+    filter: none;
 }
 
 .password-toggle:active {
@@ -1432,8 +1443,8 @@ fieldset {
 }
 
 .form-actions .btn-primary:hover {
-    background: var(--accent-secondary);
     transform: translateY(-1px);
+    filter: brightness(115%);
 }
 
 .form-actions .btn-primary:disabled {
@@ -1441,6 +1452,7 @@ fieldset {
     opacity: 0.6;
     cursor: not-allowed;
     transform: none;
+    filter: none;
 }
 
 /* --- 修改密码页面专用样式 --- */
@@ -1478,5 +1490,237 @@ fieldset {
     .form-actions .btn {
         width: 100%;
     }
->>>>>>> master
+}
+
+/* ===================================================================
+   文章标题下的图标工具栏样式
+   =================================================================== */
+
+/* 文章信息栏 */
+.post-info-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border-color-light);
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+/* 文章元信息 */
+.post-meta {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    flex-wrap: wrap;
+}
+
+.post-meta .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.post-meta .meta-item i {
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+/* 工具图标栏 */
+.post-tools {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tool-icon {
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+}
+
+.tool-icon:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border-color: var(--accent-primary);
+    transform: translateY(-1px);
+}
+
+.tool-icon:active {
+    transform: translateY(0);
+}
+
+/* 成功状态 */
+.tool-icon.success {
+    color: var(--accent-success);
+    border-color: var(--accent-success);
+}
+
+
+/* 响应式适配 */
+@media (max-width: 768px) {
+    .post-info-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .post-meta {
+        gap: 1rem;
+    }
+    
+    .post-tools {
+        gap: 0.75rem;
+    }
+    
+    .tool-icon {
+        width: 36px;
+        height: 36px;
+    }
+}
+
+@media (max-width: 480px) {
+    .post-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .post-tools {
+        width: 100%;
+        justify-content: center;
+    }
+}
+/* ===================================================================
+   固定返回顶部按钮
+   =================================================================== */
+
+.back-to-top-btn {
+    position: fixed;
+    right: 2rem;
+    bottom: 2rem;
+    width: 48px;
+    height: 48px;
+    background: var(--accent-primary);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: var(--transition);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    z-index: 1000;
+}
+
+.back-to-top-btn.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.back-to-top-btn:hover {
+    background: var(--accent-secondary);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    filter: brightness(115%);
+}
+
+/* 响应式适配 */
+@media (max-width: 768px) {
+    .back-to-top-btn {
+        right: 1rem;
+        bottom: 1rem;
+        width: 44px;
+        height: 44px;
+    }
+}
+
+@media (max-width: 480px) {
+    .back-to-top-btn {
+        right: 0.75rem;
+        bottom: 0.75rem;
+        width: 40px;
+        height: 40px;
+        font-size: 0.9rem;
+    }
+}
+/* ===================================================================
+   文章详情页排版优化 (Post Detail Typography)
+   =================================================================== */
+
+/* --- 基础排版 --- */
+.post-detail-content .post-body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 17px; /* 16px-18px 是最佳阅读字号 */
+    line-height: 1.8;
+    color: var(--text-secondary);
+    word-spacing: 1px; /* 增加英文单词间距 */
+    letter-spacing: 0.5px; /* 增加中文字符间距 */
+}
+
+@media (prefers-color-scheme: dark) {
+    .post-detail-content .post-body {
+        color: #d1d5db;
+    }
+}
+
+/* --- 标题优化 --- */
+.post-detail-content .post-body h2,
+.post-detail-content .post-body h3,
+.post-detail-content .post-body h4 {
+    margin: 2.5em 0 1.25em;
+    padding-bottom: 0.4em;
+    border-bottom: 1px solid var(--border-color-light);
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.post-detail-content .post-body h2 { font-size: 1.6em; }
+.post-detail-content .post-body h3 { font-size: 1.4em; }
+.post-detail-content .post-body h4 { font-size: 1.2em; }
+
+
+/* --- 其他元素优化 --- */
+.post-detail-content .post-body p {
+    margin-bottom: 1.25em;
+}
+
+.post-detail-content .post-body a {
+    color: var(--accent-primary);
+    text-decoration: none;
+    background-image: linear-gradient(var(--border-accent), var(--border-accent));
+    background-position: 0% 100%;
+    background-repeat: no-repeat;
+    background-size: 0% 2px;
+    transition: background-size .3s;
+}
+
+.post-detail-content .post-body a:hover {
+    background-size: 100% 2px;
+}
+
+.post-detail-content .post-body blockquote {
+    margin: 1.5rem 0;
+    padding: 1rem 1.5rem;
+    background: var(--bg-secondary);
+    border-left: 4px solid var(--accent-primary);
+    color: var(--text-muted);
 }
