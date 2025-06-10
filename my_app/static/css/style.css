@@ -793,4 +793,690 @@ fieldset {
     h3 {
         font-size: 1.25rem;
     }
+<<<<<<< HEAD
+=======
+}
+
+/* ===================================================================
+   个人资料页面 - 简洁优雅版本
+   =================================================================== */
+
+.profile-page {
+    background: var(--bg-primary);
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0;
+}
+
+/* --- 个人资料头部 - 简化版 --- */
+.profile-header {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-md);
+}
+
+.profile-main {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.profile-avatar {
+    flex-shrink: 0;
+}
+
+.profile-avatar .avatar-circle {
+    width: 64px;
+    height: 64px;
+    background: var(--accent-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.profile-info .profile-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.25rem;
+}
+
+.profile-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.profile-meta .meta-item {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.profile-badges {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    background: var(--accent-primary);
+    color: white;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.badge.admin {
+    background: #dc2626;
+}
+
+/* --- 快速统计 - 精简版 --- */
+.profile-stats {
+    display: flex;
+    justify-content: space-around;
+    padding: 1rem 0 0.5rem;
+    border-top: 1px solid var(--border-color-light);
+    text-align: center;
+}
+
+.stat-item {
+    flex: 1;
+}
+
+.stat-number {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: block;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+}
+
+/* --- 快速操作区 --- */
+.quick-actions {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-md);
+}
+
+.quick-actions h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.actions-grid {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.action-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: var(--transition);
+    min-width: 120px;
+    justify-content: center;
+}
+
+.action-link:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--accent-primary);
+    color: var(--text-primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.action-link.primary {
+    background: var(--accent-primary);
+    color: white;
+    border-color: var(--accent-primary);
+}
+
+.action-link.primary:hover {
+    background: var(--accent-secondary);
+    transform: translateY(-1px);
+}
+
+/* --- 文章列表区 - 极简版 --- */
+.profile-content {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+}
+
+.content-header {
+    padding: 1.25rem;
+    border-bottom: 1px solid var(--border-color-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg-secondary);
+}
+
+.content-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.new-post-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.25rem;
+    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: var(--transition);
+    box-shadow: var(--shadow-sm);
+}
+
+.new-post-link:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* --- 文章条目 - 简化版 --- */
+.posts-list {
+    /* 移除默认的grid，改用简单的列表 */
+}
+
+.post-item {
+    padding: 1.25rem;
+    border-bottom: 1px solid var(--border-color-light);
+    transition: var(--transition);
+}
+
+.post-item:last-child {
+    border-bottom: none;
+}
+
+.post-item:hover {
+    background: var(--bg-secondary);
+}
+
+.post-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+}
+
+.post-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.post-title a {
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.post-title a:hover {
+    color: var(--accent-primary);
+}
+
+.post-actions {
+    display: flex;
+    gap: 0.5rem;
+    opacity: 0;
+    transition: var(--transition);
+}
+
+.post-item:hover .post-actions {
+    opacity: 1;
+}
+
+.post-action-btn {
+    padding: 0.25rem 0.5rem;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: var(--transition);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.post-action-btn.edit {
+    background: var(--accent-primary);
+    color: white;
+}
+
+.post-action-btn.delete {
+    background: #dc2626;
+    color: white;
+}
+
+.post-action-btn:hover {
+    transform: translateY(-1px);
+}
+
+.post-excerpt {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 0.75rem;
+}
+
+.post-meta-simple {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* --- 空状态 --- */
+.empty-state {
+    text-align: center;
+    padding: 2rem 1.5rem;
+    color: var(--text-muted);
+}
+
+.empty-state h4 {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    margin-bottom: 1.5rem;
+}
+
+.empty-state .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--accent-primary);
+    color: white;
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.empty-state .btn:hover {
+    background: var(--accent-secondary);
+    transform: translateY(-1px);
+}
+
+/* --- 响应式优化 --- */
+@media (max-width: 768px) {
+    .profile-page {
+        margin: 0;
+        padding: 0.75rem;
+    }
+
+    .profile-header {
+        padding: 1.25rem;
+    }
+
+    .quick-actions {
+        padding: 1rem;
+    }
+
+    .profile-main {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+
+    .profile-stats {
+        justify-content: space-between;
+        padding: 0.75rem 0 0.5rem;
+    }
+
+    .actions-grid {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .action-link {
+        min-width: auto;
+        width: 100%;
+    }
+
+    .post-item {
+        padding: 1rem;
+    }
+
+    .post-item-header {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .post-actions {
+        opacity: 1; /* 在移动设备上始终显示 */
+    }
+
+    .content-header {
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: stretch;
+        padding: 1rem;
+    }
+
+    .new-post-link {
+        width: 100%;
+        justify-content: center;
+    }
+}
+/* ===================================================================
+   认证与表单页面通用样式 (Auth & Form Pages) - 更新版
+   =================================================================== */
+
+.auth-container {
+    max-width: 500px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.form-panel {
+    background: var(--bg-card, #fff);
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: var(--radius-md, 8px);
+    padding: 2.5rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.form-panel .form-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.form-panel .header-icon {
+    width: 60px;
+    height: 60px;
+    background: var(--accent-primary, #007bff);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    margin: 0 auto 1.5rem;
+}
+
+.form-panel .form-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary, #212529);
+    margin-bottom: 0.5rem;
+}
+
+.form-panel .form-subtitle {
+    color: var(--text-secondary, #6c757d);
+    font-size: 1rem;
+}
+
+/* --- 表单元素 --- */
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-wrapper .input-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    z-index: 2;
+}
+
+.input-wrapper .form-input {
+    width: 100%;
+    padding: 0.875rem 1rem 0.875rem 2.75rem;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    transition: var(--transition);
+    padding-right: 3rem; /* 为密码切换按钮留空间 */
+}
+
+.input-wrapper .form-input:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    outline: none;
+}
+
+/* --- 密码切换按钮 --- */
+.password-toggle {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted, #6c757d);
+    padding: 0.5rem;
+    border-radius: var(--radius-sm);
+    z-index: 3;
+    /* 禁用所有动画和变换 */
+    transition: none !important;
+}
+
+.password-toggle:hover {
+    color: var(--text-primary);
+    /* 确保hover时不发生任何位移 */
+    transform: translateY(-50%) !important;
+    background: transparent !important;
+}
+
+.password-toggle:active {
+    transform: translateY(-50%) !important;
+}
+
+.password-toggle:focus {
+    transform: translateY(-50%) !important;
+    outline: none;
+}
+
+/* --- 密码强度条 --- */
+.password-strength {
+    margin-top: 0.75rem;
+}
+
+.strength-bar {
+    height: 4px;
+    background: var(--bg-tertiary);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.strength-fill {
+    height: 100%;
+    width: 0;
+    border-radius: 2px;
+    transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.strength-fill.weak { 
+    width: 25%; 
+    background: var(--accent-danger); 
+}
+
+.strength-fill.fair { 
+    width: 50%; 
+    background: var(--accent-warning); 
+}
+
+.strength-fill.good { 
+    width: 75%; 
+    background: var(--accent-primary); 
+}
+
+.strength-fill.strong { 
+    width: 100%; 
+    background: var(--accent-success); 
+}
+
+.strength-text {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+    display: block;
+}
+
+/* --- 密码匹配指示器 --- */
+.match-indicator {
+    position: absolute;
+    right: 2.75rem; /* 调整位置避免与眼睛图标重叠 */
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--accent-success);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 2;
+}
+
+.match-indicator.show {
+    opacity: 1;
+}
+
+/* --- 表单错误信息 --- */
+.error-message {
+    display: block;
+    margin-top: 0.5rem;
+    color: var(--accent-danger);
+    font-size: 0.875rem;
+}
+
+/* --- 表单动作按钮 --- */
+.form-actions {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.form-actions .btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: var(--transition);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+}
+
+.form-actions .btn.cancel-btn {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+}
+
+.form-actions .btn.cancel-btn:hover {
+    background: var(--border-color-light);
+    color: var(--text-primary);
+}
+
+.form-actions .btn-primary {
+    background: var(--accent-primary);
+    color: white;
+}
+
+.form-actions .btn-primary:hover {
+    background: var(--accent-secondary);
+    transform: translateY(-1px);
+}
+
+.form-actions .btn-primary:disabled {
+    background: var(--accent-primary);
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* --- 修改密码页面专用样式 --- */
+.change-password-container {
+    max-width: 500px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.password-form-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    box-shadow: var(--shadow-md);
+}
+
+/* --- 响应式适配 --- */
+@media (max-width: 768px) {
+    .auth-container,
+    .change-password-container {
+        margin: 1rem;
+        padding: 0;
+    }
+    
+    .form-panel,
+    .password-form-card {
+        padding: 1.5rem;
+    }
+    
+    .form-actions {
+        flex-direction: column-reverse;
+    }
+    
+    .form-actions .btn {
+        width: 100%;
+    }
+>>>>>>> master
 }

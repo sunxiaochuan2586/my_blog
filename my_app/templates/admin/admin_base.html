@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 引入 Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+        integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- 引入后台专用 CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <title>{{ title }} - 后台管理</title>
+</head>
+
+<body>
+    <div class="admin-wrapper">
+        <!-- 后台侧边栏 (共享部分) -->
+        <aside class="admin-sidebar">
+            <div class="admin-sidebar-header">
+                <h2>后台管理</h2>
+                <p>管理中心</p>
+            </div>
+            <nav class="admin-nav">
+                <!-- 
+                    通过 active_page 变量来动态添加 active class 
+                    这个变量需要在 Flask 路由函数中传递
+                -->
+                <a href="{{ url_for('admin.dashboard') }}" class="admin-nav-link {% if active_page == 'dashboard' %}active{% endif %}">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>仪表盘</span>
+                </a>
+                <a href="{{ url_for('admin.post_list') }}" class="admin-nav-link {% if active_page == 'post_list' %}active{% endif %}">
+                    <i class="fas fa-file-alt"></i>
+                    <span>文章管理</span>
+                </a>
+                <a href="{{ url_for('admin.user_list') }}" class="admin-nav-link {% if active_page == 'user_list' %}active{% endif %}">
+                    <i class="fas fa-users"></i>
+                    <span>用户管理</span>
+                </a>
+                <a href="{{ url_for('routes.index') }}" class="admin-nav-link return-link">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>返回前台</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- 后台主要内容 (可变部分) -->
+        <main class="admin-main">
+            {% block admin_content %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- 用于存放页面特有的 JavaScript -->
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

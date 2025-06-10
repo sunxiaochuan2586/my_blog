@@ -38,7 +38,7 @@ def dashboard():
     all_posts = Post.query.order_by(Post.date_posted.desc()).limit(5).all() # 只取最新的5篇文章
 
     # '总浏览量' 是一个高级功能，我们暂时用一个假数据来填充
-    total_views = post_count * 123 
+    total_views = post_count  
 
     # 把所有需要的数据一次性传递给 dashboard.html
     return render_template(
@@ -46,10 +46,11 @@ def dashboard():
         title='后台管理',
         user_count=user_count,
         post_count=post_count,
+        active_page='dashboard',
         total_views=total_views,
         users=all_users,  # 将用户列表传给模板
         posts=all_posts   # 将文章列表传给模板
-    )
+        )
 
 
 @admin_bp.route('/users')
@@ -60,8 +61,7 @@ def user_list():
     
     # user_list.html 模板中需要计算每个用户的文章数，
     # 但通过 user.posts 关系可以直接获取，所以不需要额外查询 posts
-    
-    return render_template('admin/user_list.html', title='用户管理', users=users)
+    return render_template('admin/user_list.html', title='用户管理', users=users,active_page='user_list')
 
 
 @admin_bp.route('/posts')
@@ -74,4 +74,4 @@ def post_list():
     # 使用 .join() 和 .distinct() 来确保只获取有文章的作者且不重复
     authors = User.query.join(Post, User.id == Post.user_id).distinct().all()
     
-    return render_template('admin/post_list.html', title='文章管理', posts=posts, authors=authors)
+    return render_template('admin/post_list.html', title='文章管理', posts=posts, authors=authors,active_page='post_list')

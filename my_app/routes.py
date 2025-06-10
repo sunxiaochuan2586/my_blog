@@ -111,7 +111,7 @@ def inject_recent_posts():
 @routes_bp.route('/profile')
 @login_required
 def profile():
-    """显示用户个人资料页面"""
+    posts = Post.query.filter_by(author=current_user).order_by(Post.date_posted.desc()).all()
     # Flask-Login 提供的 current_user 就是当前登录的用户对象
     # 我们可以直接把它传递给模板
     return render_template('profile.html', title='我的账户')

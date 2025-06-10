@@ -1,28 +1,56 @@
-{# 继承你现有的、风格统一的基础模板 #}
-{% extends "base.html" %}
-
-{# 我们不再需要侧边栏了，所以重写整个 page_wrapper #}
-{% block page_wrapper %}
-<div class="admin-main-container">
-
-    {# 保留和前台风格一致的消息闪现区域 #}
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    <div class="flash-messages-container">
-        {% for category, message in messages %}
-        <div class="alert alert-{{ category }}">
-            <i class="fas fa-info-circle"></i>
-            <span>{{ message }}</span>
+<!-- my_app/templates/admin/base.html -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - 后台管理</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* 简单的后台布局样式 */
+        body { background-color: #f8f9fa; display: flex; }
+        .admin-sidebar { width: 220px; background-color: #2c3e50; color: #fff; position: fixed; height: 100%; }
+        .admin-sidebar-header { padding: 1.5rem; text-align: center; font-size: 1.2rem; border-bottom: 1px solid #4a5568; }
+        .admin-sidebar-header a { color: #fff; text-decoration: none; font-weight: bold; }
+        .admin-nav { margin-top: 1rem; }
+        .admin-nav-link { display: flex; align-items: center; padding: 0.8rem 1.5rem; color: #a0aec0; text-decoration: none; transition: all 0.2s; }
+        .admin-nav-link:hover { background-color: #4a5568; color: #fff; }
+        .admin-nav-link.active { background-color: #3498db; color: #fff; font-weight: bold; }
+        .admin-nav-link i { margin-right: 1rem; width: 20px; }
+        .admin-main-content { margin-left: 220px; flex-grow: 1; padding: 2rem; }
+    </style>
+</head>
+<body>
+    <aside class="admin-sidebar">
+        <div class="admin-sidebar-header">
+            <a href="{{ url_for('routes.index') }}" title="返回网站首页">Ramo's Blog</a>
         </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-    {% endwith %}
+        <nav class="admin-nav">
+            <a href="{{ url_for('admin.dashboard') }}" class="admin-nav-link {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+                <i class="fas fa-tachometer-alt"></i>仪表盘
+            </a>
+            <a href="{{ url_for('admin.user_list') }}" class="admin-nav-link {% if request.endpoint == 'admin.user_list' %}active{% endif %}">
+                <i class="fas fa-users"></i>用户管理
+            </a>
+            <a href="{{ url_for('admin.post_list') }}" class="admin-nav-link {% if request.endpoint == 'admin.post_list' %}active{% endif %}">
+                <i class="fas fa-file-alt"></i>文章管理
+            </a>
+        </nav>
+    </aside>
 
-    {# 这是后台页面的主要内容区，将由具体页面填充 #}
-    <div class="admin-content-area">
+    <main class="admin-main-content">
+        <!-- 闪现消息 -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <!-- 具体页面的内容将在这里注入 -->
         {% block admin_content %}{% endblock %}
-    </div>
-
-</div>
-{% endblock page_wrapper %}
+    </main>
+</body>
+</html>
