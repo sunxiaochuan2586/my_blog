@@ -3,6 +3,9 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from my_app.models import User
+from flask_wtf import FlaskForm
+from wtforms import StringField, TextAreaField, SubmitField
+from wtforms.validators import DataRequired, Length, URL, Optional
 
 class RegistrationForm(FlaskForm):
     username = StringField('用户名',
@@ -45,3 +48,18 @@ class ChangePasswordForm(FlaskForm):
         validators=[DataRequired(), EqualTo('new_password', message='两次输入的新密码必须一致！')]
     )
     submit = SubmitField('确认修改')
+
+class EditProfileForm(FlaskForm):
+    bio = TextAreaField('个性签名', 
+                        validators=[Optional(), Length(min=0, max=200)],
+                        render_kw={"placeholder": "介绍一下自己..."})
+    
+    github_url = StringField('GitHub 主页', 
+                             validators=[Optional(), URL(message='请输入有效的URL')],
+                             render_kw={"placeholder": "https://github.com/your-username"})
+    
+    website_url = StringField('个人网站', 
+                              validators=[Optional(), URL(message='请输入有效的URL')],
+                              render_kw={"placeholder": "https://your-website.com"})
+    
+    submit = SubmitField('保存更改')    

@@ -17,6 +17,10 @@ class User(db.Model, UserMixin):
     posts = db.relationship('Post', backref='author', lazy=True)
     is_admin = db.Column(db.Boolean, nullable=False, default=False)
     registration_date = db.Column(db.DateTime, nullable=False, default=datetime.now(timezone.utc))
+    avatar_hash = db.Column(db.String(32), default=None) # 用于生成 Gravatar 头像链接
+    bio = db.Column(db.String(200), nullable=True) # 个性签名
+    github_url = db.Column(db.String(120), nullable=True) # GitHub 链接
+    website_url = db.Column(db.String(120), nullable=True) # 个人网站链接    
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}')"

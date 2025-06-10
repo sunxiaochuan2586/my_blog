@@ -6,7 +6,8 @@ from my_app.forms import RegistrationForm, LoginForm, PostForm
 from flask_login import login_user, logout_user, current_user, login_required
 from my_app.forms import  ChangePasswordForm
 from sqlalchemy import func # <-- 导入 func
-
+from .forms import EditProfileForm # 导入刚刚创建的表单
+import hashlib # 用于计算 MD5
 
 # 确保这里的变量名是 routes_bp
 routes_bp = Blueprint('routes', __name__ )
@@ -19,33 +20,54 @@ def index():
 
 @routes_bp.route('/register', methods=['GET', 'POST'])
 def register():
-    if current_user.is_authenticated: return redirect(url_for('routes.index'))
+    if current_user.is_authenticated: 
+        return redirect(url_for('routes.index'))
+    
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         user = User(username=form.username.data, email=form.email.data, password_hash=hashed_password)
+        
+        # --- 新增逻辑：在创建用户时生成 avatar_hash ---
+        if user.email:
+            email_hash = hashlib.md5(user.email.lower().encode('utf-8')).hexdigest()
+            user.avatar_hash = email_hash
+        # --- 逻辑结束 ---
+
         db.session.add(user)
         db.session.commit()
+        
         flash('账户创建成功！现在可以登录了。', 'success')
         return redirect(url_for('routes.login'))
     
     return render_template('register.html', title='注册', form=form)
 
+
 @routes_bp.route("/login", methods=['GET', 'POST'])
 def login():
-    if current_user.is_authenticated: return redirect(url_for('routes.index'))
+    if current_user.is_authenticated: 
+        return redirect(url_for('routes.index'))
+        
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user and bcrypt.check_password_hash(user.password_hash, form.password.data):
             login_user(user, remember=form.remember.data)
+            
+            # --- 新增逻辑：在用户登录时检查并补充 avatar_hash ---
+            if user.avatar_hash is None and user.email:
+                email_hash = hashlib.md5(user.email.lower().encode('utf-8')).hexdigest()
+                user.avatar_hash = email_hash
+                db.session.commit()
+            # --- 逻辑结束 ---
+
             next_page = request.args.get('next')
             flash('登录成功！', 'success')
             return redirect(next_page) if next_page else redirect(url_for('routes.index'))
         else:
             flash('登录失败，请检查邮箱和密码。', 'danger')
+            
     return render_template('login.html', title='登录', form=form)
-
 @routes_bp.route('/post/new', methods=['GET', 'POST'])
 @login_required
 def new_post():
@@ -157,3 +179,32 @@ def change_password():
             # 3. 如果“当前密码”不正确，就给出提示
             flash('当前密码不正确，请重试。', 'danger')
     return render_template('change_password.html', title='修改密码', form=form)
+
+
+@routes_bp.route('/edit-profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    form = EditProfileForm()
+    
+    if form.validate_on_submit():
+        # --- 处理表单提交 ---
+        current_user.bio = form.bio.data
+        current_user.github_url = form.github_url.data
+        current_user.website_url = form.website_url.data
+        
+        # 计算并保存 email 的 MD5 hash 用于 Gravatar
+        if current_user.email:
+            email_hash = hashlib.md5(current_user.email.lower().encode('utf-8')).hexdigest()
+            current_user.avatar_hash = email_hash
+
+        db.session.commit()
+        flash('你的个人资料已更新！', 'success')
+        return redirect(url_for('routes.profile')) # 更新后重定向回个人资料页
+
+    elif request.method == 'GET':
+        # --- 预填充表单的当前数据 ---
+        form.bio.data = current_user.bio
+        form.github_url.data = current_user.github_url
+        form.website_url.data = current_user.website_url
+        
+    return render_template('edit_profile.html', title='编辑资料', form=form)
