@@ -76,33 +76,33 @@
         </aside>
     </div>
     {% endblock page_wrapper %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-<script>hljs.highlightAll();</script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // 全局密码可见性切换
-        document.body.addEventListener('click', function(event) {
-            if (event.target.closest('.password-toggle')) {
-                const button = event.target.closest('.password-toggle');
-                const wrapper = button.parentElement; // The .input-wrapper
-                const passwordInput = wrapper.querySelector('input[type="password"], input[type="text"]');
-                const icon = button.querySelector('i');
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 全局密码可见性切换
+            document.body.addEventListener('click', function (event) {
+                if (event.target.closest('.password-toggle')) {
+                    const button = event.target.closest('.password-toggle');
+                    const wrapper = button.parentElement; // The .input-wrapper
+                    const passwordInput = wrapper.querySelector('input[type="password"], input[type="text"]');
+                    const icon = button.querySelector('i');
 
-                if (passwordInput && icon) {
-                    if (passwordInput.type === 'password') {
-                        passwordInput.type = 'text';
-                        icon.classList.remove('fa-eye');
-                        icon.classList.add('fa-eye-slash');
-                    } else {
-                        passwordInput.type = 'password';
-                        icon.classList.remove('fa-eye-slash');
-                        icon.classList.add('fa-eye');
+                    if (passwordInput && icon) {
+                        if (passwordInput.type === 'password') {
+                            passwordInput.type = 'text';
+                            icon.classList.remove('fa-eye');
+                            icon.classList.add('fa-eye-slash');
+                        } else {
+                            passwordInput.type = 'password';
+                            icon.classList.remove('fa-eye-slash');
+                            icon.classList.add('fa-eye');
+                        }
                     }
                 }
-            }
+            });
         });
-    });
-</script>
+    </script>
 </body>
 
 </html>

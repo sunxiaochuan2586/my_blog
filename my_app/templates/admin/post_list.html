@@ -15,12 +15,12 @@
 <!-- 闪现消息 -->
 {% with messages = get_flashed_messages(with_categories=true) %}
 {% if messages %}
-    {% for category, message in messages %}
-    <div class="alert alert-{{ category }}">
-        <i class="fas fa-info-circle"></i>
-        <span>{{ message }}</span>
-    </div>
-    {% endfor %}
+{% for category, message in messages %}
+<div class="alert alert-{{ category }}">
+    <i class="fas fa-info-circle"></i>
+    <span>{{ message }}</span>
+</div>
+{% endfor %}
 {% endif %}
 {% endwith %}
 
@@ -73,13 +73,14 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="post-card-content">
                 <h3 class="post-title">
                     <a href="{{ url_for('routes.update_post', post_id=post.id) }}">{{ post.title }}</a>
                 </h3>
                 <div class="post-excerpt">
-                    {{ (post.content[:100] + '...') if post.content and post.content|length > 100 else (post.content or '暂无内容') }}
+                    {{ (post.content[:100] + '...') if post.content and post.content|length > 100 else (post.content or
+                    '暂无内容') }}
                 </div>
                 <div class="post-meta">
                     <div class="meta-item">
@@ -92,14 +93,15 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="post-card-footer">
                 <div class="post-actions">
                     <a href="{{ url_for('routes.update_post', post_id=post.id) }}" class="action-btn edit">
                         <i class="fas fa-edit"></i>
                         编辑
                     </a>
-                    <a href="{{ url_for('routes.post_detail', post_id=post.id) }}" class="action-btn view" target="_blank">
+                    <a href="{{ url_for('routes.post_detail', post_id=post.id) }}" class="action-btn view"
+                        target="_blank">
                         <i class="fas fa-eye"></i>
                         查看
                     </a>
@@ -126,89 +128,89 @@
 
 {% block scripts %}
 <script>
-// 菜单切换
-function toggleMenu(button) {
-    // 关闭其他菜单
-    document.querySelectorAll('.menu-dropdown').forEach(menu => {
-        if (menu !== button.nextElementSibling) {
-            menu.classList.remove('show');
-        }
-    });
-    
-    // 切换当前菜单
-    const dropdown = button.nextElementSibling;
-    dropdown.classList.toggle('show');
-}
-
-// 点击外部关闭菜单
-document.addEventListener('click', function(e) {
-    if (!e.target.closest('.post-menu')) {
+    // 菜单切换
+    function toggleMenu(button) {
+        // 关闭其他菜单
         document.querySelectorAll('.menu-dropdown').forEach(menu => {
-            menu.classList.remove('show');
-        });
-    }
-});
-
-// 删除文章
-function deletePost(postId) {
-    if (confirm('确定要删除这篇文章吗？此操作不可恢复。')) {
-        // 这里应该发送删除请求到后端
-        // 示例：发送POST请求到删除URL
-        fetch(`/admin/posts/${postId}/delete`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': getCsrfToken() // 如果使用CSRF保护
+            if (menu !== button.nextElementSibling) {
+                menu.classList.remove('show');
             }
-        })
-        .then(response => {
-            if (response.ok) {
-                location.reload(); // 重新加载页面
-            } else {
-                alert('删除失败，请重试');
-            }
-        })
-        .catch(error => {
-            alert('删除失败，请重试');
         });
+
+        // 切换当前菜单
+        const dropdown = button.nextElementSibling;
+        dropdown.classList.toggle('show');
     }
-}
 
-// 获取CSRF Token（如果需要）
-function getCsrfToken() {
-    const meta = document.querySelector('meta[name="csrf-token"]');
-    return meta ? meta.getAttribute('content') : '';
-}
-
-// 搜索功能
-document.getElementById('searchInput').addEventListener('input', function(e) {
-    const searchTerm = e.target.value.toLowerCase();
-    filterPosts();
-});
-
-// 作者筛选
-document.getElementById('authorFilter').addEventListener('change', function(e) {
-    filterPosts();
-});
-
-// 筛选功能
-function filterPosts() {
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-    const selectedAuthor = document.getElementById('authorFilter').value;
-    const postCards = document.querySelectorAll('.post-card');
-    
-    postCards.forEach(card => {
-        const title = card.dataset.title;
-        const author = card.dataset.author;
-        
-        const matchesSearch = !searchTerm || title.includes(searchTerm);
-        const matchesAuthor = !selectedAuthor || author === selectedAuthor;
-        
-        if (matchesSearch && matchesAuthor) {
-            card.style.display = 'block';
-        } else {
-            card.style.display = 'none';
+    // 点击外部关闭菜单
+    document.addEventListener('click', function (e) {
+        if (!e.target.closest('.post-menu')) {
+            document.querySelectorAll('.menu-dropdown').forEach(menu => {
+                menu.classList.remove('show');
+            });
         }
     });
-}
+
+    // 删除文章
+    function deletePost(postId) {
+        if (confirm('确定要删除这篇文章吗？此操作不可恢复。')) {
+            // 这里应该发送删除请求到后端
+            // 示例：发送POST请求到删除URL
+            fetch(`/admin/posts/${postId}/delete`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCsrfToken() // 如果使用CSRF保护
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload(); // 重新加载页面
+                    } else {
+                        alert('删除失败，请重试');
+                    }
+                })
+                .catch(error => {
+                    alert('删除失败，请重试');
+                });
+        }
+    }
+
+    // 获取CSRF Token（如果需要）
+    function getCsrfToken() {
+        const meta = document.querySelector('meta[name="csrf-token"]');
+        return meta ? meta.getAttribute('content') : '';
+    }
+
+    // 搜索功能
+    document.getElementById('searchInput').addEventListener('input', function (e) {
+        const searchTerm = e.target.value.toLowerCase();
+        filterPosts();
+    });
+
+    // 作者筛选
+    document.getElementById('authorFilter').addEventListener('change', function (e) {
+        filterPosts();
+    });
+
+    // 筛选功能
+    function filterPosts() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const selectedAuthor = document.getElementById('authorFilter').value;
+        const postCards = document.querySelectorAll('.post-card');
+
+        postCards.forEach(card => {
+            const title = card.dataset.title;
+            const author = card.dataset.author;
+
+            const matchesSearch = !searchTerm || title.includes(searchTerm);
+            const matchesAuthor = !selectedAuthor || author === selectedAuthor;
+
+            if (matchesSearch && matchesAuthor) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
 </script>
 {% endblock scripts %}
