@@ -24,6 +24,7 @@ At line:1 char:1
 > pip install email_validator
 > pip install flask-wtf
 > pip install tzdata
+> pip install mistune
 
 
 在项目目录下创建一个instance文件夹
