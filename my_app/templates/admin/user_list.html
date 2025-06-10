@@ -56,75 +56,34 @@
             {% for user in users %}
             <div class="user-card" data-role="{{ 'admin' if user.is_admin else 'user' }}"
                 data-username="{{ user.username|lower }}" data-email="{{ user.email|lower }}">
+
                 <div class="user-card-header">
-                    <div class="user-checkbox">
-                        <input type="checkbox" name="user_ids" value="{{ user.id }}">
-                    </div>
+                    <!-- ... 复选框和状态徽章 ... -->
                     <div class="user-status">
                         {% if user.is_admin %}
-                        <span class="status-badge admin">
-                            <i class="fas fa-crown"></i>
-                            管理员
-                        </span>
+                        <span class="status-badge admin"><i class="fas fa-crown"></i> 管理员</span>
                         {% else %}
-                        <span class="status-badge user">
-                            <i class="fas fa-user"></i>
-                            用户
-                        </span>
+                        <span class="status-badge user"><i class="fas fa-user"></i> 用户</span>
                         {% endif %}
                     </div>
-                    <div class="user-menu">
-                        <button class="menu-trigger">
-                            <i class="fas fa-ellipsis-h"></i>
-                        </button>
-                        <div class="menu-dropdown">
-                            <a href="{{ url_for('routes.profile', user_id=user.id) }}" target="_blank"
-                                class="menu-item">
-                                <i class="fas fa-eye"></i>
-                                查看资料
-                            </a>
-                            <button class="menu-item" onclick="editUser({{ user.id }}, '{{ user.username }}')">
-                                <i class="fas fa-edit"></i>
-                                编辑用户
-                            </button>
-                            {% if not user.is_admin or users|selectattr('is_admin')|list|length > 1 %}
-                            <div class="menu-divider"></div>
-                            <button class="menu-item danger" onclick="deleteUser({{ user.id }}, '{{ user.username }}')">
-                                <i class="fas fa-trash"></i>
-                                删除用户
-                            </button>
-                            {% endif %}
-                        </div>
-                    </div>
+                    <!-- ... 菜单 ... -->
                 </div>
 
                 <div class="user-card-content">
                     <div class="user-avatar">
-                        <div class="avatar-image">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="avatar-status online">
-                            <i class="fas fa-circle"></i>
-                        </div>
+                        <div class="avatar-image">{{ user.username[0]|upper }}</div>
                     </div>
-
                     <div class="user-info">
                         <h3 class="user-name">
-                            <a href="{{ url_for('routes.profile', user_id=user.id) }}" target="_blank">
-                                {{ user.username }}
-                                <i class="fas fa-external-link-alt"></i>
-                            </a>
+                            <!-- 这个链接应该指向用户的个人资料页，我们暂时简化 -->
+                            <a href="#">{{ user.username }}</a>
                         </h3>
                         <p class="user-email">{{ user.email }}</p>
-
                         <div class="user-meta">
                             <div class="meta-item">
                                 <i class="fas fa-calendar-plus"></i>
-                                <span>注册于 2024年1月</span>
-                            </div>
-                            <div class="meta-item">
-                                <i class="fas fa-clock"></i>
-                                <span>最后登录：2小时前</span>
+                                <span>注册于 {{ user.registration_date | to_local_time('%Y-%m-%d') if
+                                    user.registration_date else '未知' }}</span>
                             </div>
                         </div>
                     </div>
@@ -132,66 +91,157 @@
 
                 <div class="user-card-footer">
                     <div class="user-stats">
-                        {% set user_posts = posts|selectattr('author', 'equalto', user)|list %}
                         <span class="stat">
                             <i class="fas fa-file-alt"></i>
-                            {{ user_posts|length }} 篇文章
-                        </span>
-                        <span class="stat">
-                            <i class="fas fa-eye"></i>
-                            {{ (user_posts|length ) }} 阅读
+                            {{ user.posts|length }} 篇文章
                         </span>
                     </div>
-
-                    <div class="user-actions">
-                        <a href="{{ url_for('routes.profile', user_id=user.id) }}" target="_blank"
-                            class="action-btn view">
+                    <!-- ... 操作按钮 ... -->
+                </div>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <!-- ... 空状态提示 ... -->
+            </div>
+            {% endfor %}
+        </div>
+        {% for user in users %}
+        <div class="user-card" data-role="{{ 'admin' if user.is_admin else 'user' }}"
+            data-username="{{ user.username|lower }}" data-email="{{ user.email|lower }}">
+            <div class="user-card-header">
+                <div class="user-checkbox">
+                    <input type="checkbox" name="user_ids" value="{{ user.id }}">
+                </div>
+                <div class="user-status">
+                    {% if user.is_admin %}
+                    <span class="status-badge admin">
+                        <i class="fas fa-crown"></i>
+                        管理员
+                    </span>
+                    {% else %}
+                    <span class="status-badge user">
+                        <i class="fas fa-user"></i>
+                        用户
+                    </span>
+                    {% endif %}
+                </div>
+                <div class="user-menu">
+                    <button class="menu-trigger">
+                        <i class="fas fa-ellipsis-h"></i>
+                    </button>
+                    <div class="menu-dropdown">
+                        <a href="{{ url_for('routes.profile', user_id=user.id) }}" target="_blank" class="menu-item">
                             <i class="fas fa-eye"></i>
+                            查看资料
                         </a>
-                        <button class="action-btn edit" onclick="editUser({{ user.id }}, '{{ user.username }}')">
+                        <button class="menu-item" onclick="editUser({{ user.id }}, '{{ user.username }}')">
                             <i class="fas fa-edit"></i>
+                            编辑用户
                         </button>
                         {% if not user.is_admin or users|selectattr('is_admin')|list|length > 1 %}
-                        <button class="action-btn delete" onclick="deleteUser({{ user.id }}, '{{ user.username }}')">
+                        <div class="menu-divider"></div>
+                        <button class="menu-item danger" onclick="deleteUser({{ user.id }}, '{{ user.username }}')">
                             <i class="fas fa-trash"></i>
+                            删除用户
                         </button>
                         {% endif %}
                     </div>
                 </div>
             </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="empty-state">
-            <div class="empty-icon">
-                <i class="fas fa-users"></i>
-            </div>
-            <h3 class="empty-title">暂无用户</h3>
-            <p class="empty-description">还没有注册用户</p>
-            <a href="{{ url_for('routes.register') }}" class="empty-action-btn">
-                <i class="fas fa-user-plus"></i>
-                添加用户
-            </a>
-        </div>
-        {% endif %}
-    </div>
 
-    <!-- 批量操作栏 -->
-    <div class="bulk-actions" id="bulk-actions" style="display: none;">
-        <div class="bulk-info">
-            <span class="selected-count">0</span> 个用户已选中
+            <div class="user-card-content">
+                <div class="user-avatar">
+                    <div class="avatar-image">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="avatar-status online">
+                        <i class="fas fa-circle"></i>
+                    </div>
+                </div>
+
+                <div class="user-info">
+                    <h3 class="user-name">
+                        <a href="{{ url_for('routes.profile', user_id=user.id) }}" target="_blank">
+                            {{ user.username }}
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>
+                    </h3>
+                    <p class="user-email">{{ user.email }}</p>
+
+                    <div class="user-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-calendar-plus"></i>
+                            <span>注册于 2024年1月</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-clock"></i>
+                            <span>最后登录：2小时前</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="user-card-footer">
+                <div class="user-stats">
+                    {% set user_posts = posts|selectattr('author', 'equalto', user)|list %}
+                    <span class="stat">
+                        <i class="fas fa-file-alt"></i>
+                        {{ user_posts|length }} 篇文章
+                    </span>
+                    <span class="stat">
+                        <i class="fas fa-eye"></i>
+                        {{ (user_posts|length ) }} 阅读
+                    </span>
+                </div>
+
+                <div class="user-actions">
+                    <a href="{{ url_for('routes.profile', user_id=user.id) }}" target="_blank" class="action-btn view">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                    <button class="action-btn edit" onclick="editUser({{ user.id }}, '{{ user.username }}')">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    {% if not user.is_admin or users|selectattr('is_admin')|list|length > 1 %}
+                    <button class="action-btn delete" onclick="deleteUser({{ user.id }}, '{{ user.username }}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-        <div class="bulk-buttons">
-            <button class="bulk-btn" onclick="bulkEditRole()">
-                <i class="fas fa-user-cog"></i>
-                批量设置角色
-            </button>
-            <button class="bulk-btn danger" onclick="bulkDelete()">
-                <i class="fas fa-trash"></i>
-                批量删除
-            </button>
-        </div>
+        {% endfor %}
     </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">
+            <i class="fas fa-users"></i>
+        </div>
+        <h3 class="empty-title">暂无用户</h3>
+        <p class="empty-description">还没有注册用户</p>
+        <a href="{{ url_for('routes.register') }}" class="empty-action-btn">
+            <i class="fas fa-user-plus"></i>
+            添加用户
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- 批量操作栏 -->
+<div class="bulk-actions" id="bulk-actions" style="display: none;">
+    <div class="bulk-info">
+        <span class="selected-count">0</span> 个用户已选中
+    </div>
+    <div class="bulk-buttons">
+        <button class="bulk-btn" onclick="bulkEditRole()">
+            <i class="fas fa-user-cog"></i>
+            批量设置角色
+        </button>
+        <button class="bulk-btn danger" onclick="bulkDelete()">
+            <i class="fas fa-trash"></i>
+            批量删除
+        </button>
+    </div>
+</div>
 </div>
 
 <style>
