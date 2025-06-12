@@ -1,0 +1,127 @@
+{% extends "admin/admin_base.html" %}
+
+{% block admin_content %}
+<!-- 顶部栏 -->
+<div class="admin-top-bar">
+    <a href="{{ url_for('admin.user_list') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i>
+        返回用户列表
+    </a>
+    <div class="admin-actions">
+        <a href="{{ url_for('admin.edit_user', user_id=user.id) }}" class="btn btn-primary">
+            <i class="fas fa-edit"></i>
+            编辑此用户
+        </a>
+    </div>
+</div>
+
+<!-- 闪现消息 -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert alert-{{ category }}">
+    <i
+        class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
+    <span>{{ message }}</span>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<div class="user-detail-container">
+    <!-- 左侧：用户信息卡片 -->
+    <div class="user-detail-card">
+        <div class="user-card-header">
+            {% if user.avatar_hash %}
+            <img src="https://cn.gravatar.com/avatar/{{ user.avatar_hash }}?d=identicon&s=100"
+                class="user-detail-avatar">
+            {% else %}
+            <div class="user-detail-avatar-placeholder">
+                {{ user.username[0]|upper }}
+            </div>
+            {% endif %}
+            <h2>{{ user.username }}</h2>
+            <p class="user-detail-email">{{ user.email }}</p>
+            {% if user.is_admin %}
+            <span class="status-badge admin"><i class="fas fa-crown"></i> 管理员</span>
+            {% else %}
+            <span class="status-badge user"><i class="fas fa-user"></i> 普通用户</span>
+            {% endif %}
+        </div>
+        <div class="user-detail-body">
+            <h4>用户信息</h4>
+            <p><strong>个性签名:</strong> {{ user.bio or '暂未设置' }}</p>
+            <p><strong>GitHub:</strong> {% if user.github_url %}<a href="{{ user.github_url }}" target="_blank">{{
+                    user.github_url }}</a>{% else %}暂未设置{% endif %}</p>
+            <p><strong>个人网站:</strong> {% if user.website_url %}<a href="{{ user.website_url }}" target="_blank">{{
+                    user.website_url }}</a>{% else %}暂未设置{% endif %}</p>
+            <p><strong>注册日期:</strong> {{ user.registration_date.strftime('%Y-%m-%d %H:%M') if user.registration_date }}
+            </p>
+        </div>
+        <div class="user-detail-stats">
+            <div class="stat-item">
+                <span class="stat-number">{{ user.posts|length }}</span>
+                <p>文章数</p>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">{{ user_total_views }}</span>
+                <p>总阅读</p>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">
+                    {% if user.posts|length > 0 %}
+                    {{ (user_total_views / user.posts|length)|round|int }}
+                    {% else %}
+                    0
+                    {% endif %}
+                </span>
+                <p>平均阅读</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右侧：该用户的文章列表 -->
+    <div class="user-posts-list">
+        <h3>{{ user.username }} 的文章</h3>
+        {% if user.posts %}
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>标题</th>
+                        <th>发布日期</th>
+                        <th>阅读量</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for post in user.posts|sort(attribute='date_posted', reverse=True) %}
+                    <tr>
+                        <td>
+                            <a href="{{ url_for('routes.post_detail', post_id=post.id) }}" target="_blank"
+                                title="在前台查看">
+                                {{ post.title }}
+                            </a>
+                        </td>
+                        <td>{{ post.date_posted.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ post.views or 0 }}</td>
+                        <td>
+                            <a href="{{ url_for('routes.update_post', post_id=post.id) }}" class="btn-sm btn-edit"
+                                title="编辑文章">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state-sm">
+            <i class="fas fa-file-alt"></i>
+            <p>该用户还未发布任何文章。</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock admin_content %}

@@ -1,0 +1,91 @@
+{% extends "admin/admin_base.html" %}
+
+{% block admin_content %}
+<!-- 顶部栏 -->
+<div class="admin-top-bar">
+    <h1>仪表盘概览</h1>
+    <div class="admin-actions">
+        <a href="{{ url_for('routes.new_post') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i>
+            新建文章
+        </a>
+    </div>
+</div>
+
+<!-- 闪现消息 -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">
+        <i class="fas fa-info-circle"></i>
+        <span>{{ message }}</span>
+    </div>
+    {% endfor %}
+{% endif %}
+{% endwith %}
+
+<!-- 统计概览 -->
+<section class="dashboard-stats">
+    <div class="stat-card">
+        <div class="stat-icon users">
+            <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-content">
+            <h3>{{ user_count or 0 }}</h3>
+            <p>注册用户</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon posts">
+            <i class="fas fa-file-alt"></i>
+        </div>
+        <div class="stat-content">
+            <h3>{{ post_count or 0 }}</h3>
+            <p>发布文章</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon views">
+            <i class="fas fa-eye"></i>
+        </div>
+        <div class="stat-content">
+            <h3>{{ total_views or 0 }}</h3>
+            <p>总浏览量</p>
+        </div>
+    </div>
+</section>
+
+<!-- 快速操作 -->
+<section class="quick-actions">
+    <h2>快速操作</h2>
+    <div class="action-grid">
+        <a href="{{ url_for('routes.new_post') }}" class="action-item">
+            <div class="action-icon">
+                <i class="fas fa-plus"></i>
+            </div>
+            <div class="action-text">
+                <h4>创建文章</h4>
+                <p>撰写新的博客文章</p>
+            </div>
+        </a>
+        <a href="{{ url_for('admin.post_list') }}" class="action-item">
+            <div class="action-icon">
+                <i class="fas fa-edit"></i>
+            </div>
+            <div class="action-text">
+                <h4>管理文章</h4>
+                <p>编辑和管理现有文章</p>
+            </div>
+        </a>
+        <a href="{{ url_for('admin.user_list') }}" class="action-item">
+            <div class="action-icon">
+                <i class="fas fa-user-cog"></i>
+            </div>
+            <div class="action-text">
+                <h4>用户管理</h4>
+                <p>管理注册用户</p>
+            </div>
+        </a>
+    </div>
+</section>
+{% endblock admin_content %}

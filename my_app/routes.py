@@ -4,9 +4,15 @@ from my_app import db, bcrypt
 from my_app.models import User, Post
 from my_app.forms import RegistrationForm, LoginForm, PostForm
 from flask_login import login_user, logout_user, current_user, login_required
+from my_app.forms import  ChangePasswordForm
+from sqlalchemy import func # <-- 导入 func
+from .forms import EditProfileForm # 导入刚刚创建的表单
+import re # <-- 确保导入 re 模块，用于正则表达式
+import hashlib # 用于计算 MD5
 
 # 确保这里的变量名是 routes_bp
-routes_bp = Blueprint('routes', __name__)
+routes_bp = Blueprint('routes', __name__ )
+
 
 @routes_bp.route('/')
 def index():
@@ -15,33 +21,54 @@ def index():
 
 @routes_bp.route('/register', methods=['GET', 'POST'])
 def register():
-    if current_user.is_authenticated: return redirect(url_for('routes.index'))
+    if current_user.is_authenticated:
+        return redirect(url_for('routes.index'))
+
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         user = User(username=form.username.data, email=form.email.data, password_hash=hashed_password)
+
+        # --- 新增逻辑：在创建用户时生成 avatar_hash ---
+        if user.email:
+            email_hash = hashlib.md5(user.email.lower().encode('utf-8')).hexdigest()
+            user.avatar_hash = email_hash
+        # --- 逻辑结束 ---
+
         db.session.add(user)
         db.session.commit()
+
         flash('账户创建成功！现在可以登录了。', 'success')
         return redirect(url_for('routes.login'))
-    
+
     return render_template('register.html', title='注册', form=form)
+
 
 @routes_bp.route("/login", methods=['GET', 'POST'])
 def login():
-    if current_user.is_authenticated: return redirect(url_for('routes.index'))
+    if current_user.is_authenticated:
+        return redirect(url_for('routes.index'))
+
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user and bcrypt.check_password_hash(user.password_hash, form.password.data):
             login_user(user, remember=form.remember.data)
+
+            # --- 新增逻辑：在用户登录时检查并补充 avatar_hash ---
+            if user.avatar_hash is None and user.email:
+                email_hash = hashlib.md5(user.email.lower().encode('utf-8')).hexdigest()
+                user.avatar_hash = email_hash
+                db.session.commit()
+            # --- 逻辑结束 ---
+
             next_page = request.args.get('next')
             flash('登录成功！', 'success')
             return redirect(next_page) if next_page else redirect(url_for('routes.index'))
         else:
             flash('登录失败，请检查邮箱和密码。', 'danger')
-    return render_template('login.html', title='登录', form=form)
 
+    return render_template('login.html', title='登录', form=form)
 @routes_bp.route('/post/new', methods=['GET', 'POST'])
 @login_required
 def new_post():
@@ -62,7 +89,14 @@ def logout():
 @routes_bp.route('/post/<int:post_id>')
 def post_detail(post_id: int):
     post = Post.query.get_or_404(post_id)
+    if post.views is None:
+        post.views = 0
+    post.views += 1  # 使用更简洁的 += 语法
+    db.session.commit()
     return render_template('post_detail.html', post=post, title=post.title)
+
+
+
 
 
 @routes_bp.route('/post/<int:post_id>/update', methods=['GET', 'POST'])
@@ -81,7 +115,7 @@ def update_post(post_id: int):
     elif request.method == 'GET':
         form.title.data = post.title
         form.content.data = post.content
-    
+
     # ▼▼▼ 核心修改 ▼▼▼
     # 将 post 对象传递给模板，以便我们能获取 post.id 作为草稿的唯一键
     return render_template('create_post.html', title='更新文章', form=form, post=post)
@@ -105,3 +139,118 @@ def inject_recent_posts():
     """
     recent_posts = Post.query.order_by(Post.date_posted.desc()).limit(5).all()
     return dict(recent_posts=recent_posts)
+
+@routes_bp.route('/profile')
+@login_required
+def profile():
+    """
+    个人资料页视图函数。
+    需要计算并传递该用户所有文章的总浏览量。
+    """
+    # 查询当前用户的所有文章
+    posts = Post.query.filter_by(author=current_user).order_by(Post.date_posted.desc()).all()
+
+    # 使用数据库函数 sum() 来高效计算总浏览量
+    # .scalar() 会返回查询结果的第一列的第一行，如果没有结果则返回 None
+    total_views = db.session.query(func.sum(Post.views)).filter_by(author=current_user).scalar()
+
+    # 如果用户还没有任何文章或浏览量，total_views 可能为 None，我们将其设为 0
+    if total_views is None:
+        total_views = 0
+
+    return render_template('profile.html',
+                           title='我的账户',
+                           posts=posts,
+                           total_views=total_views)
+
+@routes_bp.route('/change-password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    form = ChangePasswordForm()
+    if form.validate_on_submit():
+        # 1. 验证用户输入的“当前密码”是否正确
+        if bcrypt.check_password_hash(current_user.password_hash, form.current_password.data):
+            # 2. 如果正确，就设置新密码
+            new_hashed_password = bcrypt.generate_password_hash(form.new_password.data).decode('utf-8')
+            current_user.password_hash = new_hashed_password
+            db.session.commit()
+            flash('密码修改成功！', 'success')
+            return redirect(url_for('routes.profile')) # 修改成功后，跳回到个人资料页
+        else:
+            # 3. 如果“当前密码”不正确，就给出提示
+            flash('当前密码不正确，请重试。', 'danger')
+    return render_template('change_password.html', title='修改密码', form=form)
+
+
+@routes_bp.route('/edit-profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    form = EditProfileForm()
+
+    if form.validate_on_submit():
+        # --- 对 github_url 进行预处理和手动验证 ---
+        processed_github_url = None
+        if form.github_url.data:
+            cleaned_github_input = form.github_url.data.strip()
+
+            # 提取用户名
+            username = ""
+            if "github.com/" in cleaned_github_input:
+                parts = cleaned_github_input.split("github.com/")
+                username = parts[-1].strip('/')
+            else:
+                username = cleaned_github_input
+
+            # 对提取出的用户名进行简单的合法性检查（可选，但推荐）
+            # GitHub 用户名通常只包含字母、数字、连字符，且不能以连字符开头/结尾，不能有两个连续连字符
+            # 这里的正则是一个简化版，你可以根据需要更严格
+            if username and not re.match(r'^[a-zA-Z0-9-]+$', username):
+                form.github_url.errors.append("GitHub 用户名包含非法字符，请只使用字母、数字和连字符。")
+            elif username:
+                processed_github_url = f"https://github.com/{username}"
+            # 如果 username 为空，processed_github_url 保持 None
+
+        # 如果 GitHub URL 存在手动添加的错误，则阻止提交
+        if form.github_url.errors:
+            return render_template('edit_profile.html', title='编辑资料', form=form)
+
+
+        # --- 对 website_url 进行预处理 ---
+        # website_url 字段仍然使用 WTForms 的 URL 验证器，这里只做协议补全
+        if form.website_url.data:
+            cleaned_website_input = form.website_url.data.strip()
+            # 如果没有协议，自动添加 https://
+            if not cleaned_website_input.startswith(('http://', 'https://')):
+                form.website_url.data = 'https://' + cleaned_website_input
+            else:
+                form.website_url.data = cleaned_website_input
+        else:
+            form.website_url.data = None # 如果没有输入，设置为 None
+
+        # --- 将预处理后的数据保存到数据库 ---
+        current_user.bio = form.bio.data
+        current_user.github_url = processed_github_url # 使用处理后的 GitHub URL
+        current_user.website_url = form.website_url.data
+
+        # 计算并保存 email 的 MD5 hash 用于 Gravatar
+        if current_user.email:
+            email_hash = hashlib.md5(current_user.email.lower().encode('utf-8')).hexdigest()
+            current_user.avatar_hash = email_hash
+
+        db.session.commit()
+        flash('你的个人资料已更新！', 'success')
+        return redirect(url_for('routes.profile'))
+
+    elif request.method == 'GET':
+        # --- 预填充表单的当前数据 ---
+        form.bio.data = current_user.bio
+
+        # 从数据库加载数据到表单时，如果希望前端只显示用户名
+        if current_user.github_url and "github.com/" in current_user.github_url:
+            form.github_url.data = current_user.github_url.split('github.com/')[-1]
+        else:
+            form.github_url.data = current_user.github_url # 如果不是标准格式或 None，直接显示
+
+        form.website_url.data = current_user.website_url # website_url 直接显示完整 URL
+
+    return render_template('edit_profile.html', title='编辑资料', form=form)

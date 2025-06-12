@@ -3,6 +3,21 @@
 {# ▼▼▼ 核心修改：重写 page_wrapper 块，不再使用两栏布局 ▼▼▼ #}
 {% block page_wrapper %}
 <div class="auth-page-wrapper">
+
+    {# --- 新增：在这里显示 flash 消息 --- #}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        {# 使用你在 style.css 中已经定义好的 alert 样式 #}
+        <div class="alert alert-{{ category }}" style="margin-bottom: 1.5rem;">
+            <i class="fas fa-info-circle"></i>
+            <span>{{ message }}</span>
+        </div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+    {# --- 新增结束 --- #}
+
     <h1>登录</h1>
 
     <form method="POST" action="">

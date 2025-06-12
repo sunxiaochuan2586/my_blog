@@ -1,0 +1,150 @@
+<!-- templates/edit_profile.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="form-panel compact-profile-panel">
+        <div class="form-header">
+            <h1 class="form-title">
+                <i class="fas fa-user-edit"></i>
+                编辑个人资料
+            </h1>
+        </div>
+
+        <form method="POST" action="{{ url_for('routes.edit_profile') }}" novalidate>
+            {{ form.hidden_tag() }}
+
+            <!-- 头像和基本信息区域 -->
+            <div class="profile-edit-grid">
+                <!-- 左侧：头像 -->
+                <div class="avatar-section">
+                    <div class="avatar-container">
+                        {% if current_user.avatar_hash %}
+                        <img src="https://cn.gravatar.com/avatar/{{ current_user.avatar_hash }}?d=identicon&s=100"
+                            class="profile-avatar" alt="头像">
+                        {% else %}
+                        <div class="profile-avatar-placeholder">
+                            {{ current_user.username[0]|upper }}
+                        </div>
+                        {% endif %}
+                        <div class="avatar-badge">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                    </div>
+                    <div class="avatar-info">
+                        <p class="username">{{ current_user.username }}</p>
+                        <button type="button" class="change-avatar-btn" onclick="showAvatarHelp()">
+                            更换头像
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 右侧：表单字段 -->
+                <div class="fields-section">
+                    <!-- 个性签名 -->
+                    <div class="form-group">
+                        <label class="form-label">
+                            个性签名
+                            <span class="char-count" id="bioCount">0/500</span>
+                        </label>
+                        {{ form.bio(class="form-input bio-input", placeholder="介绍一下自己...") }}
+                        {% for error in form.bio.errors %}
+                        <span class="error-message">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <!-- GitHub -->
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fab fa-github"></i>
+                            GitHub
+                        </label>
+                        <div class="input-group">
+                            <span class="input-prefix">github.com/</span>
+                            {{ form.github_url(class="form-input", placeholder="用户名") }}
+                        </div>
+                        {% for error in form.github_url.errors %}
+                        <span class="error-message">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <!-- 个人网站 -->
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-globe"></i>
+                            个人网站
+                        </label>
+                        {{ form.website_url(class="form-input", placeholder="https://example.com") }}
+                        {% for error in form.website_url.errors %}
+                        <span class="error-message">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- 按钮区域 -->
+            <div class="form-actions compact-actions">
+                {{ form.submit(class="btn btn-primary") }}
+                <a href="{{ url_for('routes.profile') }}" class="btn cancel-btn">取消</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 简化的头像帮助提示 -->
+<div class="avatar-tooltip" id="avatarTooltip" style="display: none;">
+    <div class="tooltip-content">
+        <h4>更换头像</h4>
+        <p>1. 访问 <a href="https://gravatar.com" target="_blank">Gravatar.com</a></p>
+        <p>2. 使用邮箱：<code>{{ current_user.email }}</code></p>
+        <p>3. 上传头像图片</p>
+        <button class="close-tooltip" onclick="closeAvatarHelp()">知道了</button>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const bioInput = document.querySelector('.bio-input');
+        const bioCount = document.getElementById('bioCount');
+
+        // 字符计数
+        function updateCharCount() {
+            const count = bioInput.value.length;
+            bioCount.textContent = `${count}/500`;
+
+            if (count > 450) {
+                bioCount.style.color = 'var(--accent-danger)';
+            } else if (count > 400) {
+                bioCount.style.color = 'var(--accent-warning)';
+            } else {
+                bioCount.style.color = 'var(--text-muted)';
+            }
+        }
+
+        if (bioInput) {
+            updateCharCount();
+            bioInput.addEventListener('input', updateCharCount);
+        }
+    });
+
+    // 头像帮助提示
+    function showAvatarHelp() {
+        const tooltip = document.getElementById('avatarTooltip');
+        tooltip.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeAvatarHelp() {
+        const tooltip = document.getElementById('avatarTooltip');
+        tooltip.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    // 点击外部关闭
+    document.getElementById('avatarTooltip').addEventListener('click', function (e) {
+        if (e.target === this) {
+            closeAvatarHelp();
+        }
+    });
+</script>
+{% endblock %}

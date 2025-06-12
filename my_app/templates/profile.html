@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="profile-page">
+    <!-- 个人资料头部 - 简化版 -->
+    <section class="profile-header">
+        <div class="profile-main">
+            <!-- 改动 1: 更新头像显示逻辑，使用 Gravatar -->
+            <div class="profile-avatar">
+                {% if current_user.avatar_hash %}
+                    <img src="https://cn.gravatar.com/avatar/{{ current_user.avatar_hash }}?d=identicon&s=100" 
+                         alt="用户头像" 
+                         style="border-radius: 50%; width: 64px; height: 64px; object-fit: cover;">
+                {% else %}
+                    <div class="avatar-circle">
+                        {{ current_user.username[0].upper() }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="profile-info">
+                <h1 class="profile-name">{{ current_user.username }}</h1>
+
+                <!-- 改动 2: 在用户名下方显示个性签名 -->
+                {% if current_user.bio %}
+                <p style="color: var(--text-muted); margin: 0.5rem 0 1rem; font-size: 0.95rem;">{{ current_user.bio }}</p>
+                {% endif %}
+
+                <div class="profile-meta">
+                    <span class="meta-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        加入于 {{ current_user.registration_date.strftime('%Y年%m月') }}
+                    </span>
+                    <span class="meta-item">
+                        <i class="fas fa-envelope"></i>
+                        {{ current_user.email }}
+                    </span>
+                    
+                    <!-- 改动 3: 新增社交链接的显示 -->
+                    {% if current_user.github_url %}
+                    <a href="{{ current_user.github_url }}" target="_blank" rel="noopener noreferrer" class="meta-item" title="GitHub">
+                        <i class="fab fa-github"></i>
+                    </a>
+                    {% endif %}
+                    
+                    {% if current_user.website_url %}
+                    <a href="{{ current_user.website_url }}" target="_blank" rel="noopener noreferrer" class="meta-item" title="个人网站">
+                        <i class="fas fa-globe"></i>
+                    </a>
+                    {% endif %}
+                </div>
+
+                <div class="profile-badges">
+                    <span class="badge">
+                        <i class="fas fa-feather-alt"></i>
+                        创作者
+                    </span>
+                    {% if current_user.is_admin %}
+                    <span class="badge admin">
+                        <i class="fas fa-crown"></i>
+                        管理员
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- 简化统计 -->
+        <div class="profile-stats">
+            <div class="stat-item">
+                <span class="stat-number">{{ posts|length }}</span>
+                <div class="stat-label">文章</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">{{ total_views or 0 }}</span>
+                <div class="stat-label">阅读</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">{{ (posts|length * 23) }}</span>
+                <div class="stat-label">点赞</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 账户管理 -->
+    <section class="quick-actions">
+        <h3>账户管理</h3>
+        <div class="actions-grid">
+            <a href="{{ url_for('routes.change_password') }}" class="action-link">
+                <i class="fas fa-key"></i>
+                <span>修改密码</span>
+            </a>
+            <!-- 改动 4: 将“编辑资料”按钮链接到新页面 -->
+            <a href="{{ url_for('routes.edit_profile') }}" class="action-link">
+                <i class="fas fa-user-edit"></i>
+                <span>编辑资料</span>
+            </a>
+            <a href="#" class="action-link" onclick="alert('功能开发中')">
+                <i class="fas fa-cog"></i>
+                <span>偏好设置</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- 文章列表 -->
+    <section class="profile-content">
+        <div class="content-header">
+            <h3 class="content-title">我的文章 ({{ posts|length }})</h3>
+            <a href="{{ url_for('routes.new_post') }}" class="new-post-link">
+                <i class="fas fa-plus"></i>
+                <span>写文章</span>
+            </a>
+        </div>
+
+        {% if posts %}
+        <div class="posts-list">
+            {% for post in posts %}
+            <article class="post-item">
+                <div class="post-item-header">
+                    <h4 class="post-title">
+                        <a href="{{ url_for('routes.post_detail', post_id=post.id) }}">
+                            {{ post.title }}
+                        </a>
+                    </h4>
+                    <div class="post-actions">
+                        <a href="{{ url_for('routes.update_post', post_id=post.id) }}" 
+                           class="post-action-btn edit">
+                            <i class="fas fa-edit"></i>
+                            编辑
+                        </a>
+                        <form action="{{ url_for('routes.delete_post', post_id=post.id) }}" 
+                              method="POST" 
+                              style="display:inline;" 
+                              onsubmit="return confirm('确定删除这篇文章？');">
+                            <button type="submit" class="post-action-btn delete">
+                                <i class="fas fa-trash"></i>
+                                删除
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <div class="post-excerpt">
+                    {{ (post.content[:120] + '...') if post.content|length > 120 else post.content }}
+                </div>
+                <div class="post-meta-simple">
+                    <span>发布于 {{ post.date_posted.strftime('%Y-%m-%d') }}</span>
+                    <span>{{ post.content|length }} 字</span>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <h4>还没有发布文章</h4>
+            <p>开始你的创作之旅，分享你的想法和见解</p>
+            <a href="{{ url_for('routes.new_post') }}" class="btn">
+                <i class="fas fa-plus"></i>
+                撰写第一篇文章
+            </a>
+        </div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

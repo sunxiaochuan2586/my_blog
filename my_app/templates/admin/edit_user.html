@@ -1,0 +1,88 @@
+{% extends "admin/admin_base.html" %}
+
+{% block admin_content %}
+<!-- 顶部栏 -->
+<div class="admin-top-bar">
+    <a href="{{ url_for('admin.user_detail', user_id=user.id) }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i>
+        返回用户详情
+    </a>
+    <h1>编辑用户: {{ user.username }}</h1>
+</div>
+
+<!-- 闪现消息 -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">
+        <i class="fas fa-info-circle"></i>
+        <span>{{ message }}</span>
+    </div>
+    {% endfor %}
+{% endif %}
+{% endwith %}
+
+<div class="form-container">
+    <form method="POST" action="{{ url_for('admin.edit_user', user_id=user.id) }}" novalidate>
+        <!-- 传入 WTForms 表单对象 -->
+        {{ form.hidden_tag() }}
+
+        <div class="form-card">
+            <div class="form-card-header">
+                <h3>用户基本信息</h3>
+            </div>
+            <div class="form-card-body">
+                <!-- 用户名 (通常设为只读，避免修改核心标识) -->
+                <div class="form-group">
+                    <label for="username" class="form-label">用户名</label>
+                    {{ form.username(class="form-input", readonly=true, value=user.username) }}
+                    <small class="form-text">用户名不可修改。</small>
+                </div>
+
+                <!-- 邮箱 -->
+                <div class="form-group">
+                    <label for="email" class="form-label">邮箱地址</label>
+                    {{ form.email(class="form-input") }}
+                    {% for error in form.email.errors %}
+                        <span class="error-message">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <!-- 个性签名 -->
+                <div class="form-group">
+                    <label for="bio" class="form-label">个性签名</label>
+                    {{ form.bio(class="form-input", rows=3) }}
+                    {% for error in form.bio.errors %}
+                        <span class="error-message">{{ error }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="form-card">
+            <div class="form-card-header">
+                <h3>权限管理</h3>
+            </div>
+            <div class="form-card-body">
+                <!-- 是否为管理员 -->
+                <div class="form-group form-check">
+                    {{ form.is_admin(class="form-check-input") }}
+                    <label class="form-check-label" for="is_admin">
+                        设为管理员
+                    </label>
+                    <small class="form-text">勾选后，该用户将拥有后台所有管理权限。</small>
+                    {% for error in form.is_admin.errors %}
+                        <span class="error-message">{{ error }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- 按钮区域 -->
+        <div class="form-actions">
+            {{ form.submit(class="btn btn-primary") }}
+            <a href="{{ url_for('admin.user_detail', user_id=user.id) }}" class="btn btn-secondary">取消</a>
+        </div>
+    </form>
+</div>
+{% endblock admin_content %}
