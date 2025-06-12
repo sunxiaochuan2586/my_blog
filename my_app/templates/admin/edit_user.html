@@ -1,150 +1,88 @@
-<!-- templates/edit_profile.html -->
-{% extends "base.html" %}
+{% extends "admin/admin_base.html" %}
 
-{% block content %}
-<div class="auth-container">
-    <div class="form-panel compact-profile-panel">
-        <div class="form-header">
-            <h1 class="form-title">
-                <i class="fas fa-user-edit"></i>
-                编辑个人资料
-            </h1>
+{% block admin_content %}
+<!-- 顶部栏 -->
+<div class="admin-top-bar">
+    <a href="{{ url_for('admin.user_detail', user_id=user.id) }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i>
+        返回用户详情
+    </a>
+    <h1>编辑用户: {{ user.username }}</h1>
+</div>
+
+<!-- 闪现消息 -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">
+        <i class="fas fa-info-circle"></i>
+        <span>{{ message }}</span>
+    </div>
+    {% endfor %}
+{% endif %}
+{% endwith %}
+
+<div class="form-container">
+    <form method="POST" action="{{ url_for('admin.edit_user', user_id=user.id) }}" novalidate>
+        <!-- 传入 WTForms 表单对象 -->
+        {{ form.hidden_tag() }}
+
+        <div class="form-card">
+            <div class="form-card-header">
+                <h3>用户基本信息</h3>
+            </div>
+            <div class="form-card-body">
+                <!-- 用户名 (通常设为只读，避免修改核心标识) -->
+                <div class="form-group">
+                    <label for="username" class="form-label">用户名</label>
+                    {{ form.username(class="form-input", readonly=true, value=user.username) }}
+                    <small class="form-text">用户名不可修改。</small>
+                </div>
+
+                <!-- 邮箱 -->
+                <div class="form-group">
+                    <label for="email" class="form-label">邮箱地址</label>
+                    {{ form.email(class="form-input") }}
+                    {% for error in form.email.errors %}
+                        <span class="error-message">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <!-- 个性签名 -->
+                <div class="form-group">
+                    <label for="bio" class="form-label">个性签名</label>
+                    {{ form.bio(class="form-input", rows=3) }}
+                    {% for error in form.bio.errors %}
+                        <span class="error-message">{{ error }}</span>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
 
-        <form method="POST" action="{{ url_for('routes.edit_profile') }}" novalidate>
-            {{ form.hidden_tag() }}
-
-            <!-- 头像和基本信息区域 -->
-            <div class="profile-edit-grid">
-                <!-- 左侧：头像 -->
-                <div class="avatar-section">
-                    <div class="avatar-container">
-                        {% if current_user.avatar_hash %}
-                        <img src="https://cn.gravatar.com/avatar/{{ current_user.avatar_hash }}?d=identicon&s=100"
-                            class="profile-avatar" alt="头像">
-                        {% else %}
-                        <div class="profile-avatar-placeholder">
-                            {{ current_user.username[0]|upper }}
-                        </div>
-                        {% endif %}
-                        <div class="avatar-badge">
-                            <i class="fas fa-camera"></i>
-                        </div>
-                    </div>
-                    <div class="avatar-info">
-                        <p class="username">{{ current_user.username }}</p>
-                        <button type="button" class="change-avatar-btn" onclick="showAvatarHelp()">
-                            更换头像
-                        </button>
-                    </div>
-                </div>
-
-                <!-- 右侧：表单字段 -->
-                <div class="fields-section">
-                    <!-- 个性签名 -->
-                    <div class="form-group">
-                        <label class="form-label">
-                            个性签名
-                            <span class="char-count" id="bioCount">0/500</span>
-                        </label>
-                        {{ form.bio(class="form-input bio-input", placeholder="介绍一下自己...") }}
-                        {% for error in form.bio.errors %}
+        <div class="form-card">
+            <div class="form-card-header">
+                <h3>权限管理</h3>
+            </div>
+            <div class="form-card-body">
+                <!-- 是否为管理员 -->
+                <div class="form-group form-check">
+                    {{ form.is_admin(class="form-check-input") }}
+                    <label class="form-check-label" for="is_admin">
+                        设为管理员
+                    </label>
+                    <small class="form-text">勾选后，该用户将拥有后台所有管理权限。</small>
+                    {% for error in form.is_admin.errors %}
                         <span class="error-message">{{ error }}</span>
-                        {% endfor %}
-                    </div>
-
-                    <!-- GitHub -->
-                    <div class="form-group">
-                        <label class="form-label">
-                            <i class="fab fa-github"></i>
-                            GitHub
-                        </label>
-                        <div class="input-group">
-                            <span class="input-prefix">github.com/</span>
-                            {{ form.github_url(class="form-input", placeholder="用户名") }}
-                        </div>
-                        {% for error in form.github_url.errors %}
-                        <span class="error-message">{{ error }}</span>
-                        {% endfor %}
-                    </div>
-
-                    <!-- 个人网站 -->
-                    <div class="form-group">
-                        <label class="form-label">
-                            <i class="fas fa-globe"></i>
-                            个人网站
-                        </label>
-                        {{ form.website_url(class="form-input", placeholder="https://example.com") }}
-                        {% for error in form.website_url.errors %}
-                        <span class="error-message">{{ error }}</span>
-                        {% endfor %}
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
-
-            <!-- 按钮区域 -->
-            <div class="form-actions compact-actions">
-                {{ form.submit(class="btn btn-primary") }}
-                <a href="{{ url_for('routes.profile') }}" class="btn cancel-btn">取消</a>
-            </div>
-        </form>
-    </div>
+        </div>
+        
+        <!-- 按钮区域 -->
+        <div class="form-actions">
+            {{ form.submit(class="btn btn-primary") }}
+            <a href="{{ url_for('admin.user_detail', user_id=user.id) }}" class="btn btn-secondary">取消</a>
+        </div>
+    </form>
 </div>
-
-<!-- 简化的头像帮助提示 -->
-<div class="avatar-tooltip" id="avatarTooltip" style="display: none;">
-    <div class="tooltip-content">
-        <h4>更换头像</h4>
-        <p>1. 访问 <a href="https://gravatar.com" target="_blank">Gravatar.com</a></p>
-        <p>2. 使用邮箱：<code>{{ current_user.email }}</code></p>
-        <p>3. 上传头像图片</p>
-        <button class="close-tooltip" onclick="closeAvatarHelp()">知道了</button>
-    </div>
-</div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const bioInput = document.querySelector('.bio-input');
-        const bioCount = document.getElementById('bioCount');
-
-        // 字符计数
-        function updateCharCount() {
-            const count = bioInput.value.length;
-            bioCount.textContent = `${count}/500`;
-
-            if (count > 450) {
-                bioCount.style.color = 'var(--accent-danger)';
-            } else if (count > 400) {
-                bioCount.style.color = 'var(--accent-warning)';
-            } else {
-                bioCount.style.color = 'var(--text-muted)';
-            }
-        }
-
-        if (bioInput) {
-            updateCharCount();
-            bioInput.addEventListener('input', updateCharCount);
-        }
-    });
-
-    // 头像帮助提示
-    function showAvatarHelp() {
-        const tooltip = document.getElementById('avatarTooltip');
-        tooltip.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeAvatarHelp() {
-        const tooltip = document.getElementById('avatarTooltip');
-        tooltip.style.display = 'none';
-        document.body.style.overflow = '';
-    }
-
-    // 点击外部关闭
-    document.getElementById('avatarTooltip').addEventListener('click', function (e) {
-        if (e.target === this) {
-            closeAvatarHelp();
-        }
-    });
-</script>
-{% endblock %}
+{% endblock admin_content %}

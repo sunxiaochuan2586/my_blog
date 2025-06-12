@@ -107,7 +107,7 @@ def edit_user(user_id):
     """
     user_to_edit = User.query.get_or_404(user_id)
     # 实例化管理员专用的编辑表单，并传入原始用户信息用于验证
-    form = AdminEditUserForm(original_user=user_to_edit)
+    form = AdminEditUserForm(original_user=user_to_edit, obj=user_to_edit)
 
     # 如果是 POST 请求且表单验证通过
     if form.validate_on_submit():
@@ -131,11 +131,11 @@ def edit_user(user_id):
         return redirect(url_for('admin.user_detail', user_id=user_to_edit.id))
 
     # 如果是 GET 请求，用该用户的现有数据预填充表单
-    elif request.method == 'GET':
-        form.username.data = user_to_edit.username
-        form.email.data = user_to_edit.email
-        form.bio.data = user_to_edit.bio
-        form.is_admin.data = user_to_edit.is_admin
+    # elif request.method == 'GET':
+    #     form.username.data = user_to_edit.username
+    #     form.email.data = user_to_edit.email
+    #     form.bio.data = user_to_edit.bio
+    #     form.is_admin.data = user_to_edit.is_admin
 
     # 渲染编辑用户的模板
     return render_template(

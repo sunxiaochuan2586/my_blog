@@ -55,9 +55,8 @@ class EditProfileForm(FlaskForm):
                         render_kw={"placeholder": "介绍一下自己..."})
     
     github_url = StringField('GitHub 主页', 
-                             validators=[Optional(), URL(message='请输入有效的URL')],
-                             render_kw={"placeholder": "https://github.com/your-username"})
-    
+                             validators=[Optional(), Length(max=255)],
+                             render_kw={"placeholder": "用户名"}) # 修改 placeholder 以匹配你的意图
     website_url = StringField('个人网站', 
                               validators=[Optional(), URL(message='请输入有效的URL')],
                               render_kw={"placeholder": "https://your-website.com"})
